@@ -2,14 +2,8 @@ window.onload = () => {
     fetchDataAndGenerateCharts();
     cargarOpcionesMes();
 
-    document.getElementById('mergeButton').addEventListener('click', () => {
-        showMergeModal();
-    });
-
-    document.getElementById('confirmMergeButton').addEventListener('click', () => {
-        mergePayments();
-    });
-
+    document.getElementById('mergeButton').addEventListener('click', showMergeModal);
+    document.getElementById('confirmMergeButton').addEventListener('click', mergePayments);
     document.querySelector('.close').addEventListener('click', () => {
         document.getElementById('mergeModal').style.display = 'none';
     });
@@ -20,6 +14,33 @@ window.onload = () => {
         }
     });
 };
+
+const etiquetasIconos = {
+    "Restauracion": "fa-utensils",
+    "Empresa": "fa-building",
+    "Otros": "fa-shopping-cart",
+    "Ingresos": "fa-money-bill-wave",
+    "Ocio": "fa-solid fa-ticket",
+    "Viajes": "fa-plane",
+    "Transporte": "fa-bus",
+    "Multimedia": "fa-photo-video"
+};
+
+const etiquetasColores = {
+    "Ocio": "#FF6F61",
+    "Empresa": "#AEC6CF",
+    "Restauracion": "#FFB347",
+    "Viajes": "#FFC0CB",
+    "Otros": "#77DD77",
+    "Ingresos": "#89CFF0",
+    "Transporte": "#C39BD3",
+    "Multimedia": "#FFD700"
+};
+
+
+let selectedExpenses = [];
+let selectedIncomes = [];
+let selectedRowForTag = null;
 
 
 function showMergeModal() {
@@ -43,20 +64,6 @@ function showMergeModal() {
     document.getElementById('mergeModal').style.display = 'block';
 }
 
-const etiquetasIconos = {
-    "Restauracion": "fa-utensils",
-    "Empresa": "fa-building",
-    "Otros": "fa-shopping-cart",
-    "Ingresos": "fa-money-bill-wave",
-    "Ocio": "fa-solid fa-ticket",
-    "Viajes": "fa-plane",
-    "Transporte": "fa-bus",
-    "Multimedia": "fa-photo-video"  // Added icon for multimedia
-
-
-};
-
-// Función para obtener una cookie por su nombre
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -64,7 +71,6 @@ function getCookie(name) {
     return null;
 }
 
-// Cargar las opciones de mes en el desplegable
 function cargarOpcionesMes() {
     const monthFilter = document.getElementById('monthFilter');
     const currentYear = new Date().getFullYear();
@@ -85,28 +91,6 @@ function cargarOpcionesMes() {
     }
 }
 
-
-let selectedExpense = null;
-let selectedIncome = null;
-let selectedExpenseData = null;
-let selectedIncomeData = null;
-let selectedExpenses = [];
-let selectedIncomes = [];
-let selectedRowForTag = null;
-
-const etiquetasColores = {
-    "Ocio": "#FF6F61",          // Stronger Pastel Red
-    "Empresa": "#AEC6CF",       // Stronger Pastel Blue
-    "Restauracion": "#FFB347",  // Stronger Pastel Orange
-    "Viajes": "#FFC0CB",        // Stronger Pastel Yellow
-    "Otros": "#77DD77",  // Stronger Pastel Green
-    "Ingresos": "#89CFF0",// Stronger Pastel Blue
-    "Transporte": "#C39BD3",     // Stronger Pastel Purple
-    "Multimedia": "#FFD700"     // Stronger Pastel Gold
-};
-
-
-// Filtrar datos por el mes seleccionado
 function filtrarPorMes() {
     const selectedMonth = parseInt(document.getElementById('monthFilter').value);
     document.cookie = `selectedMonth=${selectedMonth};path=/;expires=${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString()}`;
@@ -122,23 +106,17 @@ function fetchDataAndGenerateCharts(mesSeleccionado = null) {
         fetch(incomeUrl).then(response => response.json())
     ])
     .then(([expensesData, incomeData]) => {
-        // Ordenar datos por fecha
         expensesData.sort((a, b) => new Date(a.fechaOperacion) - new Date(b.fechaOperacion));
         incomeData.sort((a, b) => new Date(a.fechaOperacion) - new Date(b.fechaOperacion));
 
-        // Filtrar por mes si se seleccionó uno
         if (mesSeleccionado !== null) {
             expensesData = expensesData.filter(gasto => new Date(gasto.fechaOperacion).getMonth() === mesSeleccionado);
             incomeData = incomeData.filter(ingreso => new Date(ingreso.fechaOperacion).getMonth() === mesSeleccionado);
         }
 
-        // Cargar solo los datos filtrados
-        cargarGastos(expensesData);
-        cargarIngresos(incomeData);
+        cargarDatos('gastos-lista', expensesData, 'expense');
+        cargarDatos('ingresos-lista', incomeData, 'income');
 
-
-
-        // Actualizar gráficos solo con los datos de gastos filtrados
         generarEstadisticas('grafico-gastos', expensesData, 'Gastos por Etiqueta (€)');
         generarGraficoCircular('grafico-circular', expensesData, 'Distribución de Gastos');
     })
@@ -147,72 +125,35 @@ function fetchDataAndGenerateCharts(mesSeleccionado = null) {
     });
 }
 
-function cargarGastos(data) {
-    const gastosLista = document.getElementById('gastos-lista');
-    gastosLista.innerHTML = '';  // Limpia la lista antes de cargar nuevos datos
-    data.forEach((gasto, index) => {
+function cargarDatos(listaId, data, type) {
+    const lista = document.getElementById(listaId);
+    lista.innerHTML = '';
+    data.forEach((item, index) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${new Date(gasto.fechaOperacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</td>
-            <td>${gasto.concepto}</td>
-            <td>${gasto.importe >= 0 ? '+' : ''}${gasto.importe.toFixed(2)}€</td>
+            <td>${new Date(item.fechaOperacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</td>
+            <td>${item.concepto}</td>
+            <td>${item.importe >= 0 ? '+' : ''}${item.importe.toFixed(2)}€</td>
             <td>
-                <div class="etiqueta-container" style="display: flex; align-items: center; justify-content: center; background-color: ${etiquetasColores[gasto.etiqueta] || '#ccc'}; border-radius: 10px; padding: 3px 8px; color: white; cursor: pointer;">
-                    <i class="fas ${etiquetasIconos[gasto.etiqueta] || 'fa-tag'}"></i>
-                    <select onchange="updateTag(this, ${index}, 'expense')" style="border: none; background-color: transparent; color: inherit;">
-                        ${generateEtiquetaOptions(gasto.etiqueta)}
+                <div class="etiqueta-container" style="display: flex; align-items: center; justify-content: center; background-color: ${etiquetasColores[item.etiqueta] || '#ccc'}; border-radius: 10px; padding: 3px 8px; color: white; cursor: pointer;">
+                    <i class="fas ${etiquetasIconos[item.etiqueta] || 'fa-tag'}"></i>
+                    <select onchange="updateTag(this, ${index}, '${type}')" style="border: none; background-color: transparent; color: inherit;">
+                        ${generateEtiquetaOptions(item.etiqueta)}
                     </select>
                 </div>
             </td>
         `;
 
-        // Muestra el desplegable inmediatamente al hacer clic en la celda
         const etiquetaContainer = row.querySelector('.etiqueta-container');
-        etiquetaContainer.addEventListener('click', (e) => {
+        etiquetaContainer.addEventListener('click', () => {
             const selectElement = etiquetaContainer.querySelector('select');
             selectElement.style.display = 'inline-block';
-            selectElement.focus(); // Opcional: enfocar el select automáticamente
+            selectElement.focus();
         });
 
-        row.addEventListener('click', () => selectRow(row, 'expense', data[index]));
-        gastosLista.appendChild(row);
+        row.addEventListener('click', () => selectRow(row, type, data[index]));
+        lista.appendChild(row);
     });
-}
-function cargarIngresos(data) {
-    const ingresosLista = document.getElementById('ingresos-lista');
-    ingresosLista.innerHTML = '';  // Limpia la lista antes de cargar nuevos datos
-    data.forEach((ingreso, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${new Date(ingreso.fechaOperacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</td>
-            <td>${ingreso.concepto}</td>
-            <td>${ingreso.importe >= 0 ? '+' : ''}${ingreso.importe.toFixed(2)}€</td>
-            <td>
-                <div class="etiqueta-container" style="display: flex; align-items: center; justify-content: center; background-color: ${etiquetasColores[ingreso.etiqueta] || '#ccc'}; border-radius: 10px; padding: 3px 8px; color: white; cursor: pointer;">
-                    <i class="fas ${etiquetasIconos[ingreso.etiqueta] || 'fa-tag'}"></i>
-                    <select onchange="updateTag(this, ${index}, 'income')" style="border: none; background-color: transparent; color: inherit;">
-                        ${generateEtiquetaOptions(ingreso.etiqueta)}
-                    </select>
-                </div>
-            </td>
-        `;
-
-        // Muestra el desplegable inmediatamente al hacer clic en la celda
-        const etiquetaContainer = row.querySelector('.etiqueta-container');
-        etiquetaContainer.addEventListener('click', (e) => {
-            const selectElement = etiquetaContainer.querySelector('select');
-            selectElement.style.display = 'inline-block';
-            selectElement.focus(); // Opcional: enfocar el select automáticamente
-        });
-
-        row.addEventListener('click', () => selectRow(row, 'income', data[index]));
-        ingresosLista.appendChild(row);
-    });
-}
-
-function toggleDropdown(iconElement) {
-    const selectElement = iconElement.nextElementSibling;
-    selectElement.style.display = selectElement.style.display === 'none' ? 'inline-block' : 'none';
 }
 
 function generateEtiquetaOptions(selectedEtiqueta) {
@@ -221,49 +162,31 @@ function generateEtiquetaOptions(selectedEtiqueta) {
     }).join('');
 }
 
+function selectRow(row, type, data) {
+    selectedRowForTag = data;
+    if (type === 'expense') {
+        toggleSelection(selectedExpenses, data, row);
+    } else if (type === 'income') {
+        toggleSelection(selectedIncomes, data, row);
+    }
+}
 
- function selectRow(row, type, data) {
-
-     selectedRowForTag = data;
-     console.log('selectedRowForTag:', selectedRowForTag);
-     if (type === 'expense') {
-         if (selectedExpenses.includes(data)) {
-             selectedExpenses = selectedExpenses.filter(expense => expense !== data);
-             row.classList.remove('selected');
-         } else {
-             selectedExpenses.push(data);
-             row.classList.add('selected');
-         }
-     } else if (type === 'income') {
-         if (selectedIncomes.includes(data)) {
-             selectedIncomes = selectedIncomes.filter(income => income !== data);
-             row.classList.remove('selected');
-         } else {
-             selectedIncomes.push(data);
-             row.classList.add('selected');
-         }
-     }
- }
+function toggleSelection(array, data, row) {
+    if (array.includes(data)) {
+        array.splice(array.indexOf(data), 1);
+        row.classList.remove('selected');
+    } else {
+        array.push(data);
+        row.classList.add('selected');
+    }
+}
 
 function mergePayments() {
     const mergeData = {
-        operacionGasto: {
-            "fechaOperacion": new Date(selectedExpenses[0].fechaOperacion).toISOString().replace('Z', '') + 'Z',
-            "importe": parseFloat(selectedExpenses[0].importe.toString()).toFixed(2).toString(),
-            "saldo": parseFloat(selectedExpenses[0].saldo.toString()).toFixed(2).toString(),
-            "concepto": selectedExpenses[0].concepto + "",
-            "etiqueta": selectedExpenses[0].etiqueta
-        },
-        operacionesIngreso: selectedIncomes.map(income => ({
-            "fechaOperacion": new Date(income.fechaOperacion).toISOString().replace('Z', '') + 'Z',
-            "importe": parseFloat(income.importe.toString()).toFixed(2).toString(),
-            "saldo": parseFloat(income.saldo.toString()).toFixed(2).toString(),
-            "concepto": income.concepto + "",
-            "etiqueta": income.etiqueta
-        }))
+        operacionGasto: formatOperacion(selectedExpenses[0]),
+        operacionesIngreso: selectedIncomes.map(formatOperacion)
     };
 
-    console.log('Request body:', JSON.stringify(mergeData));
     fetch('http://localhost:8080/banking/adjust_payment', {
         method: 'POST',
         headers: {
@@ -278,9 +201,8 @@ function mergePayments() {
         return response.json();
     })
     .then(data => {
-        console.log('Respuesta del servidor:', data);
         document.getElementById('mergeModal').style.display = 'none';
-        location.reload();  // Reload the page
+        location.reload();
     })
     .catch(error => {
         console.error('Error al enviar la fusión de pagos:', error);
@@ -288,18 +210,20 @@ function mergePayments() {
     });
 }
 
-function updateTag(newTag, index, type) {
-    console.log('selectedRowForTag:', selectedRowForTag.etiqueta);
-
-    const changeTagData = {
-        "fechaOperacion": new Date(selectedRowForTag.fechaOperacion).toISOString().replace('Z', '') + 'Z',
-        "importe": parseFloat(selectedRowForTag.importe.toString()).toFixed(2).toString(),
-        "saldo": parseFloat(selectedRowForTag.saldo.toString()).toFixed(2).toString(),
-        "concepto": selectedRowForTag.concepto + "",
-        "etiqueta": newTag.value
+function formatOperacion(operacion) {
+    return {
+        fechaOperacion: new Date(operacion.fechaOperacion).toISOString().replace('Z', '') + 'Z',
+        importe: parseFloat(operacion.importe.toString()).toFixed(2).toString(),
+        saldo: parseFloat(operacion.saldo.toString()).toFixed(2).toString(),
+        concepto: operacion.concepto + "",
+        etiqueta: operacion.etiqueta
     };
+}
 
-    console.log('Cambiando etiqueta:', changeTagData);
+function updateTag(newTag, index, type) {
+    const changeTagData = formatOperacion(selectedRowForTag);
+    changeTagData.etiqueta = newTag.value;
+
     fetch('http://localhost:8080/banking/change_tag', {
         method: 'POST',
         headers: {
@@ -314,9 +238,7 @@ function updateTag(newTag, index, type) {
         return response.json();
     })
     .then(data => {
-        console.log('Etiqueta cambiada con éxito:', data);
-
-        location.reload();  // Reload the page
+        location.reload();
     })
     .catch(error => {
         console.error('Error al cambiar la etiqueta:', error);
@@ -359,7 +281,7 @@ function generarEstadisticas(canvasId, data, label) {
     }
     totalGastoElement.textContent = `Gasto Total: ${totalGasto.toFixed(2)}€`;
 
-    const chart = new Chart(ctx, {
+    new Chart(ctx, {
         type: 'bar',
         data: {
             labels: etiquetas,
@@ -397,10 +319,6 @@ function generarEstadisticas(canvasId, data, label) {
     });
 }
 
-function filtrarGastosPorEtiqueta(etiqueta, data) {
-    const gastosFiltrados = data.filter(gasto => gasto.etiqueta === etiqueta);
-    cargarGastos(gastosFiltrados);
-}
 function generarGraficoCircular(canvasId, data, label) {
     const canvasContainer = document.getElementById(canvasId).parentNode;
     canvasContainer.removeChild(document.getElementById(canvasId));
@@ -435,4 +353,9 @@ function generarGraficoCircular(canvasId, data, label) {
             }]
         }
     });
+}
+
+function filtrarGastosPorEtiqueta(etiqueta, data) {
+    const gastosFiltrados = data.filter(gasto => gasto.etiqueta === etiqueta);
+    cargarDatos('gastos-lista', gastosFiltrados, 'expense');
 }

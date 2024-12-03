@@ -10,24 +10,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        #gastos-y-grafico {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
-        #gastos {
-            width: 80%;
-            margin-bottom: 20px;
-        }
-        #grafico-barras-section {
-            width: 50%;
-        }
     </style>
 </head>
 <body>
@@ -35,10 +17,10 @@
     <h1>Control de Gastos cuenta Nómina</h1>
     <label for="monthFilter">Seleccione el mes:</label>
     <select id="monthFilter" onchange="filtrarPorMes()">
-        <!-- Las opciones de meses se llenarán dinámicamente -->
+        <!-- Las opciones de meses se llenan dinámicamente -->
     </select>
     <nav id="etiquetas-barra">
-        <!-- La barra de etiquetas se llenará dinámicamente -->
+        <!-- La barra de etiquetas se llenan dinámicamente -->
     </nav>
 </header>
 
@@ -55,7 +37,7 @@
             </tr>
             </thead>
             <tbody id="gastos-lista">
-            <!-- Las filas se agregarán dinámicamente aquí -->
+            <!-- Las filas se agregan dinámicamente aquí -->
             </tbody>
         </table>
     </section>

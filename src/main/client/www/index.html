@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible=IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco - Gastos e Ingresos</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #gastos-y-grafico {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        #gastos {
+            width: 80%;
+            margin-bottom: 20px;
+        }
+        #grafico-barras-section {
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Control de Gastos cuenta Nómina</h1>
+    <label for="monthFilter">Seleccione el mes:</label>
+    <select id="monthFilter" onchange="filtrarPorMes()">
+        <!-- Las opciones de meses se llenarán dinámicamente -->
+    </select>
+    <nav id="etiquetas-barra">
+        <!-- La barra de etiquetas se llenará dinámicamente -->
+    </nav>
+</header>
+
+<section id="gastos-y-grafico">
+    <section id="gastos">
+        <h2>Gastos</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Concepto</th>
+                <th>Importe</th>
+                <th>Etiqueta</th>
+            </tr>
+            </thead>
+            <tbody id="gastos-lista">
+            <!-- Las filas se agregarán dinámicamente aquí -->
+            </tbody>
+        </table>
+    </section>
+    <section id="grafico-barras-section">
+        <canvas id="grafico-gastos"></canvas>
+    </section>
+</section>
+
+<div id="mergeModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Detalles de la Fusión de Pagos</h2>
+        <div id="mergeDetails"></div>
+        <button id="confirmMergeButton">Confirmar Fusión</button>
+    </div>
+</div>
+
+<section id="ingresos-y-grafico" class="horizontal-container">
+    <section id="ingresos">
+        <h2>Ingresos</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Concepto</th>
+                <th>Importe</th>
+                <th>Etiqueta</th>
+            </tr>
+            </thead>
+            <tbody id="ingresos-lista">
+            <!-- Las filas se agregarán dinámicamente aquí -->
+            </tbody>
+        </table>
+        <div id="button_section">
+            <button id="mergeButton">Merge Payments</button>
+        </div>
+    </section>
+
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>

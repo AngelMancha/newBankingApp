@@ -49,17 +49,19 @@ function showMergeModal() {
         return;
     }
 
-    const mergeDetails = document.getElementById('mergeDetails');
-    mergeDetails.innerHTML = `
-        <h3>Gasto Seleccionado:</h3>
-        <p>Concepto: ${selectedExpenses[0].concepto}</p>
-        <p>Importe: ${selectedExpenses[0].importe}€</p>
-        <h3>Ingresos Seleccionados:</h3>
-        ${selectedIncomes.map(income => `
-            <p>Concepto: ${income.concepto}</p>
-            <p>Importe: ${income.importe}€</p>
-        `).join('')}
-    `;
+const mergeDetails = document.getElementById('mergeDetails');
+mergeDetails.innerHTML = `
+    <h3>Gastos Seleccionados:</h3>
+    ${selectedExpenses.map(expense => `
+        <p>Concepto: ${expense.concepto}</p>
+        <p>Importe: ${expense.importe}€</p>
+    `).join('')}
+    <h3>Ingresos Seleccionados:</h3>
+    ${selectedIncomes.map(income => `
+        <p>Concepto: ${income.concepto}</p>
+        <p>Importe: ${income.importe}€</p>
+    `).join('')}
+`;
 
     document.getElementById('mergeModal').style.display = 'block';
 }
@@ -180,10 +182,9 @@ function toggleSelection(array, data, row) {
         row.classList.add('selected');
     }
 }
-
 function mergePayments() {
     const mergeData = {
-        operacionGasto: formatOperacion(selectedExpenses[0]),
+        operacionesGasto: selectedExpenses.map(formatOperacion),// Mapping all "gasto" operations
         operacionesIngreso: selectedIncomes.map(formatOperacion)
     };
 
@@ -209,7 +210,6 @@ function mergePayments() {
         alert('Hubo un error al enviar la fusión de pagos.');
     });
 }
-
 function formatOperacion(operacion) {
     return {
         fechaOperacion: new Date(operacion.fechaOperacion).toISOString().replace('Z', '') + 'Z',

@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const punycode = require('punycode'); // Desde el módulo npm
+
 
 const app = express();
 

@@ -22,8 +22,7 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
 
     @Override
     public void execute() {
-        String excelFilePath = "C:\\Users\\xboxa\\IdeaProjects\\ExpensesManagementApp\\src\\main\\transactionshistory\\movimientos.xlsx";
-
+        String excelFilePath = "C:\\Users\\xboxa\\IdeaProjects\\BankManagementApp\\src\\main\\transactionshistory\\movimientos.xlsx";
         String jsonFilePath = "output.json";
         int startRow = 11; // 0-based index, so row 12 is index 11
         int startColumn = 1; // Column B is index 1
@@ -56,7 +55,7 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                     String original = "yes";
 
                     for (int col = startColumn; col <= endColumn; col++) {
-                        if (col != 2 && col != 3 && col != 4 && col != 6 && col != 3 && col != 8) {
+                        if (col != 2 && col != 1 && col != 4 && col != 6 && col != 8) {
                             Cell cell = row.getCell(col);
                             Cell cellName = namesRow.getCell(col);
                             String cellValue = getCellValueAsString(cell);
@@ -65,7 +64,7 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                             jsonObject.put(cellDescription, cellValue);
 
                             switch (cellDescription.toLowerCase()) {
-                                case "fecha operación":
+                                case "fecha valor":
                                     fechaOperacion = cellValue.isEmpty() ? null : cellValue;
                                     break;
                                 case "importe":
@@ -76,6 +75,7 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                                     break;
                                 case "concepto":
                                     concepto = cellValue.isEmpty() ? null : cellValue;
+                                    System.out.println(concepto);
                                     break;
                             }
 

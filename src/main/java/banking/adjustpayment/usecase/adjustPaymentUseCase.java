@@ -14,14 +14,24 @@ public class adjustPaymentUseCase implements adjustPaymentUseCaseInterface {
     private final OperacionesRepository operacionesRepository;
 
     @Override
-    public Operacion execute(String fechaOperacionG, Double importeG, Double saldoG, String conceptoG, String etiquetaG, List<Operacion> operacionesIngreso) {
-        String nuevaEtiqueta = etiquetaG;
-        String nuevaFecha = fechaOperacionG;
-        String nuevoConcepto = conceptoG;
+    public Operacion execute(List<Operacion> operacionesGasto, List<Operacion> operacionesIngreso) {
 
+        String nuevaEtiqueta = operacionesGasto.get(0).getEtiqueta();
+        String nuevaFecha = operacionesGasto.get(0).getFechaOperacion().toString();
+        String nuevoConcepto = operacionesGasto.get(0).getConcepto();
+        Double nuevoImporte = 0.0;
 
-        Double nuevoImporte = importeG;
-        for(Operacion ingreso: operacionesIngreso){
+        if (operacionesGasto.size() != 1) {
+            for (Operacion gasto : operacionesGasto) {
+                nuevoImporte += gasto.getImporte();
+            }
+
+        } else {
+
+            nuevoImporte = operacionesGasto.get(0).getImporte();
+        }
+
+        for (Operacion ingreso : operacionesIngreso) {
             nuevoImporte += ingreso.getImporte();
         }
 
@@ -35,10 +45,12 @@ public class adjustPaymentUseCase implements adjustPaymentUseCaseInterface {
         nuevoGasto.setEtiqueta(nuevaEtiqueta);
 
 
-        //actualizar en la base de datos los 2 objetos y crear el nuevo:
-        operacionesRepository.updateTag(Timestamp.valueOf(fechaOperacionG), importeG, saldoG, conceptoG, "ASUMIDO");
+        //actualizar en la base de datos los objetos de gasto y crear el nuevo:
+        for (Operacion gasto : operacionesGasto) {
+            operacionesRepository.updateTag(gasto.getFechaOperacion(), gasto.getImporte(), gasto.getSaldo(), gasto.getConcepto(), "ASUMIDO");
+        }
 
-        for(Operacion ingreso: operacionesIngreso){
+        for (Operacion ingreso : operacionesIngreso) {
             operacionesRepository.updateTag(ingreso.getFechaOperacion(), ingreso.getImporte(), ingreso.getSaldo(), ingreso.getConcepto(), "ASUMIDO");
         }
         operacionesRepository.insertOperacion(Timestamp.valueOf(nuevaFecha), nuevoImporte, nuevoSaldo, nuevoConcepto, nuevaEtiqueta, nuevoOriginal);

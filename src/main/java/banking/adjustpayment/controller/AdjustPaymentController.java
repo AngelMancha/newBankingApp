@@ -20,15 +20,12 @@ public class AdjustPaymentController {
     @PostMapping("/adjust_payment")
     public ResponseEntity<Operacion> adjustPayment(@RequestBody AdjustPaymentRequestDto request) {
         // Extraer datos de las operaciones
-        Operacion operacionGasto = request.getOperacionGasto();
+        List<Operacion> operacionesGasto= request.getOperacionesGasto();
         List<Operacion> operacionesIngreso = request.getOperacionesIngreso();
-        //imprimelo
-        System.out.println(operacionGasto);
+
 
         // Llamada al caso de uso
-        Operacion nuevoGasto = adjustPaymentUseCase.execute(
-                operacionGasto.getFechaOperacion().toString(), operacionGasto.getImporte(), operacionGasto.getSaldo(),
-                operacionGasto.getConcepto(), operacionGasto.getEtiqueta(), operacionesIngreso);
+        Operacion nuevoGasto = adjustPaymentUseCase.execute(operacionesGasto, operacionesIngreso);
 
 
         // Respuesta exitosa

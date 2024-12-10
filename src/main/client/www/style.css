@@ -64,7 +64,7 @@ th {
     background: linear-gradient(to right, #01ca9a, #01d077);
 }
 
-button, #monthFilter {
+button, #monthFilter, #yearFilter {
     margin: 1rem;
     padding: 0.5rem 1rem;
     background: linear-gradient(to right, #01ca9a, #01d077);

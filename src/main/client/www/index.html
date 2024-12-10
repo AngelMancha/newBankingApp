@@ -9,19 +9,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-    <style>
-    </style>
 </head>
 <body>
 <header>
-    <h1>Control de Gastos cuenta Nómina</h1>
-    <label for="monthFilter">Seleccione el mes:</label>
-    <select id="monthFilter" onchange="filtrarPorMes()">
-        <!-- Las opciones de meses se llenan dinámicamente -->
-    </select>
-    <nav id="etiquetas-barra">
-        <!-- La barra de etiquetas se llenan dinámicamente -->
-    </nav>
+    <h1>Control de Gastos mensual cuenta Nómina</h1>
+    <div id="filterContainer">
+        <label for="monthFilter">Mes:</label>
+        <select id="monthFilter" class="filter-select" onchange="filtrarPorMes()"></select>
+        <label for="yearFilter">Año:</label>
+        <select id="yearFilter" class="filter-select" onchange="filtrarPorMes()"></select>
+    </div>
 </header>
 
 <section id="gastos-y-grafico">

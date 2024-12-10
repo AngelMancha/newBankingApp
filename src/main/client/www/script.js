@@ -75,8 +75,10 @@ function getCookie(name) {
 
 function cargarOpcionesMes() {
     const monthFilter = document.getElementById('monthFilter');
+    const yearFilter = document.getElementById('yearFilter');
     const currentYear = new Date().getFullYear();
     const selectedMonthCookie = getCookie('selectedMonth');
+    const selectedYearCookie = getCookie('selectedYear');
 
     for (let month = 0; month < 12; month++) {
         const option = document.createElement('option');
@@ -88,18 +90,29 @@ function cargarOpcionesMes() {
         }
         monthFilter.appendChild(option);
     }
-    if (selectedMonthCookie !== null) {
-        fetchDataAndGenerateCharts(parseInt(selectedMonthCookie));
+
+    for (let year = currentYear - 10; year <= currentYear; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        if (selectedYearCookie !== null && parseInt(selectedYearCookie) === year) {
+            option.selected = true;
+        }
+        yearFilter.appendChild(option);
+    }
+
+    if (selectedMonthCookie !== null && selectedYearCookie !== null) {
+        fetchDataAndGenerateCharts(parseInt(selectedMonthCookie), parseInt(selectedYearCookie));
     }
 }
-
 function filtrarPorMes() {
     const selectedMonth = parseInt(document.getElementById('monthFilter').value);
+    const selectedYear = parseInt(document.getElementById('yearFilter').value);
     document.cookie = `selectedMonth=${selectedMonth};path=/;expires=${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString()}`;
-    fetchDataAndGenerateCharts(selectedMonth);
+    document.cookie = `selectedYear=${selectedYear};path=/;expires=${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString()}`;
+    fetchDataAndGenerateCharts(selectedMonth, selectedYear);
 }
-
-function fetchDataAndGenerateCharts(mesSeleccionado = null) {
+function fetchDataAndGenerateCharts(mesSeleccionado = null, anoSeleccionado = null) {
     const expensesUrl = 'http://localhost:8080/banking/get_expenses';
     const incomeUrl = 'http://localhost:8080/banking/get_income';
 
@@ -111,9 +124,15 @@ function fetchDataAndGenerateCharts(mesSeleccionado = null) {
         expensesData.sort((a, b) => new Date(a.fechaOperacion) - new Date(b.fechaOperacion));
         incomeData.sort((a, b) => new Date(a.fechaOperacion) - new Date(b.fechaOperacion));
 
-        if (mesSeleccionado !== null) {
-            expensesData = expensesData.filter(gasto => new Date(gasto.fechaOperacion).getMonth() === mesSeleccionado);
-            incomeData = incomeData.filter(ingreso => new Date(ingreso.fechaOperacion).getMonth() === mesSeleccionado);
+        if (mesSeleccionado !== null && anoSeleccionado !== null) {
+            expensesData = expensesData.filter(gasto => {
+                const date = new Date(gasto.fechaOperacion);
+                return date.getMonth() === mesSeleccionado && date.getFullYear() === anoSeleccionado;
+            });
+            incomeData = incomeData.filter(ingreso => {
+                const date = new Date(ingreso.fechaOperacion);
+                return date.getMonth() === mesSeleccionado && date.getFullYear() === anoSeleccionado;
+            });
         }
 
         cargarDatos('gastos-lista', expensesData, 'expense');
@@ -126,7 +145,6 @@ function fetchDataAndGenerateCharts(mesSeleccionado = null) {
         console.error('Error al obtener los datos:', error);
     });
 }
-
 function cargarDatos(listaId, data, type) {
     const lista = document.getElementById(listaId);
     lista.innerHTML = '';

@@ -8,8 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Iterator;
@@ -21,15 +20,13 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
     private final OperacionesRepository operacionesRepository;
 
     @Override
-    public void execute() {
-        String excelFilePath = "C:\\Users\\xboxa\\IdeaProjects\\BankManagementApp\\src\\main\\transactionshistory\\movimientos.xlsx";
-        String jsonFilePath = "output.json";
+    public void execute(byte[] file) {
         int startRow = 11; // 0-based index, so row 12 is index 11
         int startColumn = 1; // Column B is index 1
         int endColumn = 9; // Column J is index 9
 
-        try (FileInputStream fis = new FileInputStream(excelFilePath);
-             Workbook workbook = new XSSFWorkbook(fis)) {
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(file);
+             Workbook workbook = new XSSFWorkbook(bais)) {
 
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
@@ -80,7 +77,10 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                             }
 
                            if (concepto != null) {
-                                if (concepto.contains("TRANSFERENCIA A FAVOR DE MANCHA NUÑEZ ANGEL JOSE CONCEPTO") ||
+                                if (concepto.contains("TRANSFERENCIA A FAVOR DE MANCHA NUÑEZ ANGEL JOSE") ||
+                                        concepto.contains("TRANSFERENCIA DE ANGEL JOSE MANCHA NUÑEZ") ||
+                                        concepto.contains("TRANSFERENCIA DE MANCHA NUÑEZ ANGEL JOSE") ||
+                                        concepto.contains("TRANSFERENCIA DE OPEN DIGITAL SERVICES SL") ||
                                         concepto.contains("RECARGA TARJETA PREPAGO") ||
                                         concepto.contains("DESCARGA TARJETA PREPAGO")) {
                                     etiqueta = "ASUMIDO";
@@ -105,10 +105,6 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                     }
                 }
                 currentRow++;
-            }
-
-            try (FileWriter file = new FileWriter(jsonFilePath)) {
-                file.write(jsonArray.toString(4));
             }
 
         } catch (IOException e) {

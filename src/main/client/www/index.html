@@ -7,19 +7,35 @@
     <title>Banco - Gastos e Ingresos</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 <body>
 <header>
-    <h1>Control de Gastos mensual cuenta Nómina</h1>
+    <h1>Control de Gastos Mensual Cuenta Nómina</h1>
     <div id="filterContainer">
         <label for="monthFilter">Mes:</label>
         <select id="monthFilter" class="filter-select" onchange="filtrarPorMes()"></select>
         <label for="yearFilter">Año:</label>
         <select id="yearFilter" class="filter-select" onchange="filtrarPorMes()"></select>
+        <input type="file" id="fileInput" style="display: none;" />
+        <i id="uploadIcon" class="fas fa-upload"></i>
+
     </div>
 </header>
+
+<!-- Ventana modal para mostrar el progreso de la subida -->
+<div id="uploadModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeUploadModal">&times;</span>
+        <h2>Subiendo archivo...</h2>
+        <div id="progressContainer">
+            <div id="progressBar"></div>
+        </div>
+        <p id="progressText">0%</p>
+    </div>
+</div>
 
 <section id="gastos-y-grafico">
     <section id="gastos">

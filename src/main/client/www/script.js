@@ -27,16 +27,15 @@ const etiquetasIconos = {
 };
 
 const etiquetasColores = {
-    "Ocio": "#FF6F61",
-    "Empresa": "#AEC6CF",
-    "Restauracion": "#FFB347",
-    "Viajes": "#FFC0CB",
-    "Otros": "#77DD77",
-    "Ingresos": "#89CFF0",
-    "Transporte": "#C39BD3",
-    "Multimedia": "#FFD700"
+    "Ocio": "#B5655C",         // Muted Red
+    "Empresa": "#8A9BA8",      // Muted Blue
+    "Restauracion": "#D9A05B", // Muted Orange
+    "Viajes": "#D9A5B3",       // Muted Pink
+    "Otros": "#6FAF74",        // Muted Green
+    "Ingresos": "#6FA8DC",     // Muted Light Blue
+    "Transporte": "#A992B0",   // Muted Purple
+    "Multimedia": "#D9C77B"    // Muted Yellow
 };
-
 
 let selectedExpenses = [];
 let selectedIncomes = [];
@@ -76,13 +75,12 @@ function getCookie(name) {
 function cargarOpcionesMes() {
     const monthFilter = document.getElementById('monthFilter');
     const yearFilter = document.getElementById('yearFilter');
-    const currentYear = new Date().getFullYear();
     const selectedMonthCookie = getCookie('selectedMonth');
     const selectedYearCookie = getCookie('selectedYear');
 
     for (let month = 0; month < 12; month++) {
         const option = document.createElement('option');
-        const date = new Date(currentYear, month);
+        const date = new Date(2024, month);
         option.value = month;
         option.textContent = date.toLocaleString('default', { month: 'long' });
         if (selectedMonthCookie !== null && parseInt(selectedMonthCookie) === month) {
@@ -91,7 +89,7 @@ function cargarOpcionesMes() {
         monthFilter.appendChild(option);
     }
 
-    for (let year = currentYear - 10; year <= currentYear; year++) {
+    [2024, 2025].forEach(year => {
         const option = document.createElement('option');
         option.value = year;
         option.textContent = year;
@@ -99,13 +97,12 @@ function cargarOpcionesMes() {
             option.selected = true;
         }
         yearFilter.appendChild(option);
-    }
+    });
 
     if (selectedMonthCookie !== null && selectedYearCookie !== null) {
         fetchDataAndGenerateCharts(parseInt(selectedMonthCookie), parseInt(selectedYearCookie));
     }
-}
-function filtrarPorMes() {
+}function filtrarPorMes() {
     const selectedMonth = parseInt(document.getElementById('monthFilter').value);
     const selectedYear = parseInt(document.getElementById('yearFilter').value);
     document.cookie = `selectedMonth=${selectedMonth};path=/;expires=${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString()}`;
@@ -377,3 +374,47 @@ function filtrarGastosPorEtiqueta(etiqueta, data) {
     const gastosFiltrados = data.filter(gasto => gasto.etiqueta === etiqueta);
     cargarDatos('gastos-lista', gastosFiltrados, 'expense');
 }
+// script.js
+document.getElementById('uploadIcon').addEventListener('click', () => {
+    document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput').addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://localhost:8080/banking/upload', true);
+
+        xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const percentComplete = (event.loaded / event.total) * 100;
+                document.getElementById('progressBar').style.width = percentComplete + '%';
+                document.getElementById('progressText').textContent = Math.round(percentComplete) + '%';
+            }
+        };
+
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                location.reload();
+            } else {
+                document.getElementById('progressText').textContent = 'Error uploading file';
+            }
+            document.getElementById('uploadModal').style.display = 'none';
+        };
+
+        xhr.onerror = () => {
+            document.getElementById('progressText').textContent = 'Error uploading file';
+            document.getElementById('uploadModal').style.display = 'none';
+        };
+
+        document.getElementById('uploadModal').style.display = 'block';
+        xhr.send(formData);
+    }
+});
+
+document.getElementById('closeUploadModal').addEventListener('click', () => {
+    document.getElementById('uploadModal').style.display = 'none';
+});

@@ -9,8 +9,8 @@ This application allows users to manage their banking transactions. Users can up
 - **Update Tag**: Users can update the tag of a transaction to better categorize their expenses.
 
 
-![image](readmephotos/case3.png)
-![image](readmephotos/case1.png)
+![image](readmephotos/movimientos.png)
+![image](readmephotos/grafico.png)
 
 ## Prerequisites
 
@@ -85,6 +85,6 @@ The application will be available at `http://localhost:3000/`.
 
 **IMPORTANT**
 
-- It is **necessary** to upload a file with the name **"movimientos.xlsx"** to a folder named **transactionshistory** in the root of the project. The file must have the following columns: **fecha_operacion, importe, saldo, concepto, etiqueta, original**. The file must have at least one row of data.
+- It is **necessary** to upload a file with the format **".xlsx"**. The file must have the following columns: **Fecha Operacion, Fecha Valor, Concepto, Importe and Saldo **. The file must have at least one row of data.
 
 - Also, don´t forget to include the settings for the database connection in the **application.properties** file.

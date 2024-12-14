@@ -8,6 +8,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static banking.gettransactions.usecase.GetTransactionsUseCase.findCardNumber;
+
 @Repository
 public class OperacionesRepositoryImpl implements OperacionesRepository {
 
@@ -24,15 +26,14 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
     private String tableName;
 
     @Override
-    public int countByFechaOperacionAndImporteAndSaldoAndConcepto(Timestamp fechaOperacion, Double importe, Double saldo, String concepto) {
-        String checkSql = "SELECT COUNT(*) FROM " + tableName + " WHERE fecha_operacion = ? AND importe = ? AND saldo = ? AND concepto = ?";
+    public int countByFechaOperacionAndImporteAndConcepto(Timestamp fechaOperacion, Double importe, String concepto) {
+        String checkSql = "SELECT COUNT(*) FROM " + tableName + " WHERE fecha_operacion = ? AND importe = ? AND concepto = ?";
         try (Connection connection = DriverManager.getConnection(url, user, password);
              PreparedStatement checkStatement = connection.prepareStatement(checkSql)) {
 
             checkStatement.setTimestamp(1, fechaOperacion);
             checkStatement.setObject(2, importe);
-            checkStatement.setObject(3, saldo);
-            checkStatement.setString(4, concepto);
+            checkStatement.setString(3, concepto);
 
             ResultSet rs = checkStatement.executeQuery();
             rs.next();
@@ -45,17 +46,16 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
     }
 
     @Override
-    public void insertOperacion(Timestamp fechaOperacion, Double importe, Double saldo, String concepto, String etiqueta, String original) {
-        String insertSql = "INSERT INTO " + tableName + " (fecha_operacion, importe, saldo, concepto, etiqueta, original) VALUES (?, ?, ?, ?, ?, ?)";
+    public void insertOperacion(Timestamp fechaOperacion, Double importe, String concepto, String etiqueta, String original) {
+        String insertSql = "INSERT INTO " + tableName + " (fecha_operacion, importe, concepto, etiqueta, original) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = DriverManager.getConnection(url, user, password);
              PreparedStatement insertStatement = connection.prepareStatement(insertSql)) {
 
             insertStatement.setTimestamp(1, fechaOperacion);
             insertStatement.setObject(2, importe);
-            insertStatement.setObject(3, saldo);
-            insertStatement.setString(4, concepto);
-            insertStatement.setObject(5, etiqueta);
-            insertStatement.setString(6, original);
+            insertStatement.setString(3, concepto);
+            insertStatement.setObject(4, etiqueta);
+            insertStatement.setString(5, original);
             insertStatement.executeUpdate();
 
         } catch (SQLException e) {
@@ -64,7 +64,7 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
     }
 
     @Override
-    public void updateTag(Timestamp fechaOperacion, Double importe, Double saldo, String concepto, String nuevaEtiqueta) {
+    public void updateTag(Timestamp fechaOperacion, Double importe, String concepto, String nuevaEtiqueta) {
         String updateSql = "UPDATE " + tableName + " SET etiqueta = ? WHERE importe = ? AND concepto = ?";
         try (Connection connection = DriverManager.getConnection(url, user, password);
              PreparedStatement updateStatement = connection.prepareStatement(updateSql)) {
@@ -150,25 +150,38 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
     }
 
     @Override
-    public Operacion findLatestOperacion() {
-        String selectSql = "SELECT * FROM " + tableName + " ORDER BY fecha_operacion DESC LIMIT 1";
+    public List<Operacion> auxiliarDbOperation() {
+        String selectSql = "SELECT * FROM " + tableName;
+        String updateSql = "UPDATE " + tableName + " SET concepto = ? WHERE importe = ? AND fecha_operacion = ?";
+        List<Operacion> operaciones = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(url, user, password);
              PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
 
             ResultSet rs = selectStatement.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) {
                 Operacion operacion = new Operacion();
                 operacion.setFechaOperacion(rs.getTimestamp("fecha_operacion"));
                 operacion.setImporte(rs.getDouble("importe"));
-                operacion.setSaldo(rs.getDouble("saldo"));
                 operacion.setConcepto(rs.getString("concepto"));
+                String newConcepto = findCardNumber(operacion.getConcepto());
                 operacion.setEtiqueta(rs.getString("etiqueta"));
-                return operacion;
+                try (PreparedStatement updateStatement = connection.prepareStatement(updateSql)) {
+                    updateStatement.setString(1, newConcepto);
+                    updateStatement.setObject(2, operacion.getImporte());
+                    updateStatement.setTimestamp(3, operacion.getFechaOperacion());
+                    updateStatement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                operacion.setConcepto(newConcepto);
+
+                operaciones.add(operacion);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return operaciones;
     }
+
 }

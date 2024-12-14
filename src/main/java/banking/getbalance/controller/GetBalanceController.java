@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/banking")
@@ -18,8 +20,8 @@ public class GetBalanceController {
     private final GetBalanceUseCaseInterface getBalanceUseCase;
 
     @GetMapping("/get_balance")
-    public ResponseEntity<Operacion> getBalance() {
-        Operacion ultimaOperacion = getBalanceUseCase.execute();
+    public ResponseEntity<List<Operacion>> getBalance() {
+        List<Operacion> ultimaOperacion = getBalanceUseCase.execute();
         return ResponseEntity.ok(ultimaOperacion);
     }
 }

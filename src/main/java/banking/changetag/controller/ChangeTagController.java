@@ -21,12 +21,11 @@ public class ChangeTagController {
 
         String fechaOperacion = requestBody.getFechaOperacion().toString();
         double importe = requestBody.getImporte();
-        double saldo = requestBody.getSaldo();
         String concepto = requestBody.getConcepto();
         String tag = requestBody.getEtiqueta();
 
 
-        Operacion nuevaOperacion = changeTagUseCase.execute(fechaOperacion, importe, saldo, concepto, tag);
+        Operacion nuevaOperacion = changeTagUseCase.execute(fechaOperacion, importe, concepto, tag);
         // Process the data and change the tag as needed
         // For example, update the database or perform other operations
 

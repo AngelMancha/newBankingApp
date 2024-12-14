@@ -8,7 +8,6 @@ import java.sql.Timestamp;
 public class Operacion{
     private Timestamp fechaOperacion;
     private double importe;
-    private double saldo;
     private String concepto;
     private String etiqueta;
 }

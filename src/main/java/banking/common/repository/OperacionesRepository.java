@@ -6,11 +6,11 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public interface OperacionesRepository {
-    int countByFechaOperacionAndImporteAndSaldoAndConcepto(Timestamp fechaOperacion, Double importe, Double saldo, String concepto);
+    int countByFechaOperacionAndImporteAndConcepto(Timestamp fechaOperacion, Double importe, String concepto);
 
-    void insertOperacion(Timestamp fechaOperacion, Double importe, Double saldo, String concepto, String etiqueta, String original);
+    void insertOperacion(Timestamp fechaOperacion, Double importe, String concepto, String etiqueta, String original);
 
-    void updateTag(Timestamp fechaOperacion, Double importe, Double saldo, String concepto, String nuevaEtiqueta);
+    void updateTag(Timestamp fechaOperacion, Double importe, String concepto, String nuevaEtiqueta);
 
     List<Operacion> findAllWithNegativeImporte();
 
@@ -18,5 +18,5 @@ public interface OperacionesRepository {
 
     List<Operacion> findAllWithOriginalTag();
 
-    Operacion findLatestOperacion();
+    List<Operacion> auxiliarDbOperation();
 }

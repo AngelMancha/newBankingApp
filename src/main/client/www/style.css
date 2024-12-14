@@ -1,5 +1,5 @@
 body {
-    font-family: 'San Francisco', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Cormorant Garamond', serif;
     margin: 0;
     padding: 20px;
     background-color: #f4ebd0;
@@ -47,7 +47,7 @@ header {
 table {
     width: 80%;
     margin-bottom: 1rem;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Cormorant Garamond', serif;
     border-radius: 15px;
 }
 

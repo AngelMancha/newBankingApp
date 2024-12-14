@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -46,13 +48,12 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                     JSONObject jsonObject = new JSONObject();
                     String fechaOperacion = null;
                     Double importe = null;
-                    Double saldo = null;
                     String concepto = null;
                     String etiqueta = null;
                     String original = "yes";
 
                     for (int col = startColumn; col <= endColumn; col++) {
-                        if (col != 2 && col != 1 && col != 4 && col != 6 && col != 8) {
+                        if (col != 2 && col != 1 && col != 4 && col != 6 && col != 8 && col != 9) {
                             Cell cell = row.getCell(col);
                             Cell cellName = namesRow.getCell(col);
                             String cellValue = getCellValueAsString(cell);
@@ -67,9 +68,6 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                                 case "importe":
                                     importe = cellValue.isEmpty() ? null : Double.parseDouble(cellValue);
                                     break;
-                                case "saldo":
-                                    saldo = cellValue.isEmpty() ? null : Double.parseDouble(cellValue);
-                                    break;
                                 case "concepto":
                                     concepto = cellValue.isEmpty() ? null : cellValue;
                                     System.out.println(concepto);
@@ -77,10 +75,11 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                             }
 
                            if (concepto != null) {
-                                if (concepto.contains("TRANSFERENCIA A FAVOR DE MANCHA NUÑEZ ANGEL JOSE") ||
-                                        concepto.contains("TRANSFERENCIA DE ANGEL JOSE MANCHA NUÑEZ") ||
-                                        concepto.contains("TRANSFERENCIA DE MANCHA NUÑEZ ANGEL JOSE") ||
+                                if (concepto.contains("TRANSFERENCIA A FAVOR DE MANCHA NUNEZ ANGEL JOSE") ||
+                                        concepto.contains("TRANSFERENCIA DE ANGEL JOSE MANCHA NUNEZ") ||
+                                        concepto.contains("TRANSFERENCIA DE MANCHA NUNEZ ANGEL JOSE") ||
                                         concepto.contains("TRANSFERENCIA DE OPEN DIGITAL SERVICES SL") ||
+                                        concepto.contains("LIQUIDACION CUENTA") ||
                                         concepto.contains("RECARGA TARJETA PREPAGO") ||
                                         concepto.contains("DESCARGA TARJETA PREPAGO")) {
                                     etiqueta = "ASUMIDO";
@@ -89,7 +88,12 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                                 } else {
                                     etiqueta = "otros";
                                 }
+                           }
+
+                            if (concepto != null) {
+                                concepto = findCardNumber(concepto);
                             }
+
                         }
                     }
 
@@ -97,10 +101,10 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
 
                     if (fechaOperacion != null && concepto != null) {
                         Timestamp fechaOperacionTimestamp = Timestamp.valueOf(fechaOperacion);
-                        int count = operacionesRepository.countByFechaOperacionAndImporteAndSaldoAndConcepto(fechaOperacionTimestamp, importe, saldo, concepto);
+                        int count = operacionesRepository.countByFechaOperacionAndImporteAndConcepto(fechaOperacionTimestamp, importe, concepto);
 
                         if (count == 0) {
-                            operacionesRepository.insertOperacion(fechaOperacionTimestamp, importe, saldo, concepto, etiqueta, original);
+                            operacionesRepository.insertOperacion(fechaOperacionTimestamp, importe, concepto, etiqueta, original);
                         }
                     }
                 }
@@ -132,5 +136,37 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
             default:
                 return "";
         }
+    }
+
+    private static String blurCardNunmber(String cardNumber){
+
+        char[] cardNumberArray = cardNumber.toCharArray();
+        List<String> blurredCardNumber = new ArrayList<>();
+        int counter = 0;
+        for (char i : cardNumberArray) {
+            if (counter < 12) {
+                blurredCardNumber.add("*");
+            } else {
+                blurredCardNumber.add(String.valueOf(i));
+            }
+            counter++;
+
+        }
+        return String.join("", blurredCardNumber);
+
+    }
+
+    public static String findCardNumber(String concepto){
+        String[] words = concepto.split(" ");
+        int counter = 0;
+        for (String word : words) {
+            if (word.length() == 16 && word.matches("[0-9]+")) {
+                String blurredCardNumber = blurCardNunmber(word);
+                words[counter] = blurredCardNumber;
+                return String.join(" ", words);
+            }
+            counter++;
+        }
+        return String.join(" ", words);
     }
 }

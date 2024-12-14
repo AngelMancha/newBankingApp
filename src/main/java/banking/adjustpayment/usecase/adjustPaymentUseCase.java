@@ -35,25 +35,23 @@ public class adjustPaymentUseCase implements adjustPaymentUseCaseInterface {
             nuevoImporte += ingreso.getImporte();
         }
 
-        Double nuevoSaldo = 0.0;
         String nuevoOriginal = "no";
         Operacion nuevoGasto = new Operacion();
         nuevoGasto.setFechaOperacion(Timestamp.valueOf(nuevaFecha));
         nuevoGasto.setImporte(nuevoImporte);
-        nuevoGasto.setSaldo(nuevoSaldo);
         nuevoGasto.setConcepto(nuevoConcepto);
         nuevoGasto.setEtiqueta(nuevaEtiqueta);
 
 
         //actualizar en la base de datos los objetos de gasto y crear el nuevo:
         for (Operacion gasto : operacionesGasto) {
-            operacionesRepository.updateTag(gasto.getFechaOperacion(), gasto.getImporte(), gasto.getSaldo(), gasto.getConcepto(), "ASUMIDO");
+            operacionesRepository.updateTag(gasto.getFechaOperacion(), gasto.getImporte(), gasto.getConcepto(), "ASUMIDO");
         }
 
         for (Operacion ingreso : operacionesIngreso) {
-            operacionesRepository.updateTag(ingreso.getFechaOperacion(), ingreso.getImporte(), ingreso.getSaldo(), ingreso.getConcepto(), "ASUMIDO");
+            operacionesRepository.updateTag(ingreso.getFechaOperacion(), ingreso.getImporte(),  ingreso.getConcepto(), "ASUMIDO");
         }
-        operacionesRepository.insertOperacion(Timestamp.valueOf(nuevaFecha), nuevoImporte, nuevoSaldo, nuevoConcepto, nuevaEtiqueta, nuevoOriginal);
+        operacionesRepository.insertOperacion(Timestamp.valueOf(nuevaFecha), nuevoImporte, nuevoConcepto, nuevaEtiqueta, nuevoOriginal);
 
         return nuevoGasto;
 

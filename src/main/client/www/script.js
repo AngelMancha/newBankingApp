@@ -229,7 +229,6 @@ function formatOperacion(operacion) {
     return {
         fechaOperacion: new Date(operacion.fechaOperacion).toISOString().replace('Z', '') + 'Z',
         importe: parseFloat(operacion.importe.toString()).toFixed(2).toString(),
-        saldo: parseFloat(operacion.saldo.toString()).toFixed(2).toString(),
         concepto: operacion.concepto + "",
         etiqueta: operacion.etiqueta
     };
@@ -292,9 +291,19 @@ function generarEstadisticas(canvasId, data, label) {
         totalGastoElement.id = 'totalGasto';
         totalGastoElement.style.textAlign = 'center';
         totalGastoElement.style.fontWeight = 'bold';
+        totalGastoElement.style.marginBottom = '20px';
+        totalGastoElement.style.fontSize = '1.7em';
         canvasContainer.insertBefore(totalGastoElement, newCanvas);
     }
     totalGastoElement.textContent = `Gasto Total: ${totalGasto.toFixed(2)}€`;
+
+    const maxMonto = Math.max(...montos);
+    const stepSize = 100;
+    let maxY = Math.ceil(maxMonto / stepSize) * stepSize;
+
+    if (maxMonto >= maxY - 20) {
+        maxY += stepSize;
+    }
 
     new Chart(ctx, {
         type: 'bar',
@@ -310,6 +319,9 @@ function generarEstadisticas(canvasId, data, label) {
         },
         options: {
             plugins: {
+                legend: {
+                    display: false
+                },
                 datalabels: {
                     anchor: 'end',
                     align: 'top',
@@ -319,7 +331,11 @@ function generarEstadisticas(canvasId, data, label) {
             },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    max: maxY,
+                    ticks: {
+                        stepSize: stepSize
+                    }
                 }
             },
             onClick: (event, elements) => {
@@ -333,7 +349,6 @@ function generarEstadisticas(canvasId, data, label) {
         plugins: [ChartDataLabels]
     });
 }
-
 function generarGraficoCircular(canvasId, data, label) {
     const canvasContainer = document.getElementById(canvasId).parentNode;
     canvasContainer.removeChild(document.getElementById(canvasId));

@@ -62,7 +62,6 @@ This application allows users to manage their banking transactions. Users can up
         id SERIAL PRIMARY KEY,
         fecha_operacion DATE NOT NULL,
         importe NUMERIC(10, 2) NOT NULL,
-        saldo NUMERIC(10, 2) NOT NULL,
         concepto VARCHAR(255),
         etiqueta VARCHAR(255),
         original VARCHAR(255)
@@ -85,6 +84,6 @@ The application will be available at `http://localhost:3000/`.
 
 **IMPORTANT**
 
-- It is **necessary** to upload a file with the format **".xlsx"**. The file must have the following columns: **Fecha Operacion, Fecha Valor, Concepto, Importe and Saldo **. The file must have at least one row of data.
+- It is **necessary** to upload a file with the format **".xlsx"**. The file must have the following columns: **Fecha Operacion, Fecha Valor, Concepto and Importe **. The file must have at least one row of data.
 
 - Also, don´t forget to include the settings for the database connection in the **application.properties** file.

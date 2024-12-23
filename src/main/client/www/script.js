@@ -8,12 +8,22 @@ window.onload = () => {
         document.getElementById('mergeModal').style.display = 'none';
     });
 
+    document.getElementById('clearFilterButton').addEventListener('click', clearFilters);
+
     window.addEventListener('click', (event) => {
         if (event.target == document.getElementById('mergeModal')) {
             document.getElementById('mergeModal').style.display = 'none';
         }
     });
 };
+
+function clearFilters() {
+    document.getElementById('monthFilter').value = '';
+    document.getElementById('yearFilter').value = '';
+    document.cookie = 'selectedMonth=;path=/;expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    document.cookie = 'selectedYear=;path=/;expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    fetchDataAndGenerateCharts();
+}
 
 const etiquetasIconos = {
     "Restauracion": "fa-utensils",

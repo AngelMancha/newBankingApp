@@ -75,9 +75,7 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                             }
 
                            if (concepto != null) {
-                                if (concepto.contains("TRANSFERENCIA A FAVOR DE MANCHA NUNEZ ANGEL JOSE") ||
-                                        concepto.contains("TRANSFERENCIA DE ANGEL JOSE MANCHA NUNEZ") ||
-                                        concepto.contains("TRANSFERENCIA DE MANCHA NUNEZ ANGEL JOSE") ||
+                                if (concepto.contains("TRANSFERENCIA A FAVOR DE MANCHA NUÑEZ ANGEL JOSE") ||
                                         concepto.contains("TRANSFERENCIA DE OPEN DIGITAL SERVICES SL") ||
                                         concepto.contains("LIQUIDACION CUENTA") ||
                                         concepto.contains("RECARGA TARJETA PREPAGO") ||

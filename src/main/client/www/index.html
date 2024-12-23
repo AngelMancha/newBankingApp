@@ -13,12 +13,13 @@
 </head>
 <body>
 <header>
-    <h1>Control de Gastos Mensual Cuenta Nómina</h1>
+    <h1>Control de Gastos Mensual</h1>
     <div id="filterContainer">
         <label for="monthFilter">Mes:</label>
         <select id="monthFilter" class="filter-select" onchange="filtrarPorMes()"></select>
         <label for="yearFilter">Año:</label>
         <select id="yearFilter" class="filter-select" onchange="filtrarPorMes()"></select>
+        <button id="clearFilterButton">Clear Filter</button>
         <input type="file" id="fileInput" style="display: none;" />
         <i id="uploadIcon" class="fas fa-upload"></i>
 
@@ -70,7 +71,7 @@
 
 <section id="ingresos-y-grafico" class="horizontal-container">
     <section id="ingresos">
-        <h2>Ingresos</h2>
+        <h2>Ingresos pendientes de procesar</h2>
         <table>
             <thead>
             <tr>

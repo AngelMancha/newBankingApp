@@ -1,5 +1,7 @@
 window.onload = () => {
     fetchDataAndGenerateCharts();
+    fetchMonthylyIncome();
+    fetchMonthlyExpenses();
     cargarOpcionesMes();
 
     document.getElementById('mergeButton').addEventListener('click', showMergeModal);
@@ -23,6 +25,8 @@ function clearFilters() {
     document.cookie = 'selectedMonth=;path=/;expires=Thu, 01 Jan 1970 00:00:00 UTC;';
     document.cookie = 'selectedYear=;path=/;expires=Thu, 01 Jan 1970 00:00:00 UTC;';
     fetchDataAndGenerateCharts();
+        fetchMonthylyIncome();
+        fetchMonthlyExpenses();
 }
 
 const etiquetasIconos = {
@@ -50,6 +54,8 @@ const etiquetasColores = {
 let selectedExpenses = [];
 let selectedIncomes = [];
 let selectedRowForTag = null;
+let monthlyExpensesChart = null;
+let monthlyIncomesChart = null;
 
 
 function showMergeModal() {
@@ -111,6 +117,8 @@ function cargarOpcionesMes() {
 
     if (selectedMonthCookie !== null && selectedYearCookie !== null) {
         fetchDataAndGenerateCharts(parseInt(selectedMonthCookie), parseInt(selectedYearCookie));
+            fetchMonthylyIncome();
+            fetchMonthlyExpenses();
     }
 }function filtrarPorMes() {
     const selectedMonth = parseInt(document.getElementById('monthFilter').value);
@@ -118,13 +126,69 @@ function cargarOpcionesMes() {
     document.cookie = `selectedMonth=${selectedMonth};path=/;expires=${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString()}`;
     document.cookie = `selectedYear=${selectedYear};path=/;expires=${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString()}`;
     fetchDataAndGenerateCharts(selectedMonth, selectedYear);
+        fetchMonthylyIncome();
+        fetchMonthlyExpenses();
 }
+
+function fetchMonthylyIncome() {
+
+    const montlyTilesUrl = 'http://localhost:8080/banking/get_payroll';
+    const requestBody = {
+        year: getCookie('selectedYear')
+    };
+
+    Promise.all([
+        fetch(montlyTilesUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        }).then(response => response.json())
+    ])
+    .then(([montlyTilesData]) => {
+        createMonthlyIncomeGraph(montlyTilesData);
+    })
+}
+
+function fetchMonthlyExpenses() {
+
+    const montlyTilesUrl = 'http://localhost:8080/banking/get_expenses_month';
+    const requestBody = {
+        year: getCookie('selectedYear')
+    };
+    Promise.all([
+        fetch(montlyTilesUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        }).then(response => response.json())
+    ])
+    .then(([montlyTilesData]) => {
+        createMonthlyExpensesGraph(montlyTilesData);
+    })
+}
+
+
+
 function fetchDataAndGenerateCharts(mesSeleccionado = null, anoSeleccionado = null) {
     const expensesUrl = 'http://localhost:8080/banking/get_expenses';
     const incomeUrl = 'http://localhost:8080/banking/get_income';
 
+    const requestBody = {
+        year: getCookie('selectedYear')
+    };
+
     Promise.all([
-        fetch(expensesUrl).then(response => response.json()),
+        fetch(expensesUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        }).then(response => response.json()),
         fetch(incomeUrl).then(response => response.json())
     ])
     .then(([expensesData, incomeData]) => {
@@ -146,7 +210,6 @@ function fetchDataAndGenerateCharts(mesSeleccionado = null, anoSeleccionado = nu
         cargarDatos('ingresos-lista', incomeData, 'income');
 
         generarEstadisticas('grafico-gastos', expensesData, 'Gastos por Etiqueta (€)');
-        generarGraficoCircular('grafico-circular', expensesData, 'Distribución de Gastos');
     })
     .catch(error => {
         console.error('Error al obtener los datos:', error);
@@ -180,6 +243,133 @@ function cargarDatos(listaId, data, type) {
 
         row.addEventListener('click', () => selectRow(row, type, data[index]));
         lista.appendChild(row);
+    });
+}
+
+function createMonthlyExpensesGraph(data) {
+
+    const selectedYear = document.getElementById('yearFilter').value;
+    let totalGastoElement = document.getElementById('monthlyExpensesTitle');
+    totalGastoElement.textContent = `Distribución mensual de gastos en ${selectedYear}:`;
+    const monthlyExpensesContainer = document.getElementById('monthly-expenses');
+    monthlyExpensesContainer.innerHTML = '<canvas id="monthlyExpensesChart" width="100" height="50"></canvas>';
+
+    const ctx = document.getElementById('monthlyExpensesChart').getContext('2d');
+    const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    const expenses = months.map(month => Math.abs(data[month.toLowerCase()]));
+
+    if (monthlyExpensesChart) {
+        monthlyExpensesChart.destroy();
+    }
+
+    monthlyExpensesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Monthly Expenses (€)',
+                data: expenses,
+                backgroundColor: '#b68b40',
+                borderColor: '#122620',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 200
+                    }
+                },
+                x: {
+                    barPercentage: 0.1,
+                    categoryPercentage: 0.1
+                }
+            },
+            plugins: {
+                legend: {
+                   display: false
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value) => value.toFixed(2) + '€',
+                    color: 'black'
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+}
+
+function createMonthlyIncomeGraph(data) {
+    console.log('data:', data);
+    const selectedYear = document.getElementById('yearFilter').value;
+    let totalGastoElement = document.getElementById('monthlyIncomesTitle');
+    totalGastoElement.textContent = `Distribución mensual de ingresos en ${selectedYear}:`;
+
+    const monthlyIncomesContainer = document.getElementById('monthly-incomes');
+    monthlyIncomesContainer.innerHTML = '<canvas id="monthlyIncomesChart" width="100" height="50"></canvas>';
+
+    const ctx = document.getElementById('monthlyIncomesChart').getContext('2d');
+    const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    const expenses = months.map(month => Math.abs(data[month.toLowerCase()]));
+
+    if (monthlyIncomesChart) {
+        monthlyIncomesChart.destroy();
+    }
+
+    monthlyIncomesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Monthly Incomes (€)',
+                data: expenses,
+                backgroundColor: '#122620',
+                borderColor: '#b68b40',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 200
+                    }
+                },
+                x: {
+                    barPercentage: 0.1,
+                    categoryPercentage: 0.1
+                }
+            },
+            plugins: {
+                legend: {
+                   display: false
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value) => value.toFixed(2) + '€',
+                    color: 'black'
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
     });
 }
 
@@ -270,6 +460,16 @@ function updateTag(newTag, index, type) {
     });
 }
 
+
+function darkenColor(color, percent) {
+    const num = parseInt(color.slice(1), 16),
+        amt = Math.round(2.55 * percent),
+        R = (num >> 16) - amt,
+        G = (num >> 8 & 0x00FF) - amt,
+        B = (num & 0x0000FF) - amt;
+    return `#${(0x1000000 + (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 + (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 + (B < 255 ? (B < 1 ? 0 : B) : 255)).toString(16).slice(1).toUpperCase()}`;
+}
+
 function generarEstadisticas(canvasId, data, label) {
     const canvasContainer = document.getElementById(canvasId).parentNode;
     canvasContainer.removeChild(document.getElementById(canvasId));
@@ -296,6 +496,9 @@ function generarEstadisticas(canvasId, data, label) {
     });
 
     let totalGastoElement = document.getElementById('totalGasto');
+
+
+
     if (!totalGastoElement) {
         totalGastoElement = document.createElement('div');
         totalGastoElement.id = 'totalGasto';
@@ -305,7 +508,12 @@ function generarEstadisticas(canvasId, data, label) {
         totalGastoElement.style.fontSize = '1.7em';
         canvasContainer.insertBefore(totalGastoElement, newCanvas);
     }
-    totalGastoElement.textContent = `Gasto Total: ${totalGasto.toFixed(2)}€`;
+
+    const selectedMonth = document.getElementById('monthFilter').value;
+    const selectedYear = document.getElementById('yearFilter').value;
+    const monthName = new Date(2024, selectedMonth).toLocaleString('default', { month: 'long' });
+
+    totalGastoElement.textContent = `Gasto Total en ${monthName} ${selectedYear}: ${totalGasto.toFixed(2)}€`;
 
     const maxMonto = Math.max(...montos);
     const stepSize = 100;
@@ -315,6 +523,9 @@ function generarEstadisticas(canvasId, data, label) {
         maxY += stepSize;
     }
 
+    const backgroundColors = etiquetas.map(et => etiquetasColores[et] || '#ccc');
+    const borderColors = backgroundColors.map(color => darkenColor(color, 20));
+
     new Chart(ctx, {
         type: 'bar',
         data: {
@@ -322,9 +533,9 @@ function generarEstadisticas(canvasId, data, label) {
             datasets: [{
                 label: "",
                 data: montos,
-                backgroundColor: etiquetas.map(et => etiquetasColores[et] || '#ccc'),
-                borderColor: etiquetas.map(et => etiquetasColores[et] || '#999'),
-                borderWidth: 1
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
+                borderWidth: 3
             }]
         },
         options: {
@@ -359,41 +570,8 @@ function generarEstadisticas(canvasId, data, label) {
         plugins: [ChartDataLabels]
     });
 }
-function generarGraficoCircular(canvasId, data, label) {
-    const canvasContainer = document.getElementById(canvasId).parentNode;
-    canvasContainer.removeChild(document.getElementById(canvasId));
 
-    const newCanvas = document.createElement('canvas');
-    newCanvas.id = canvasId;
-    canvasContainer.appendChild(newCanvas);
 
-    const ctx = newCanvas.getContext('2d');
-    const etiquetas = [];
-    const montos = [];
-
-    data.forEach(item => {
-        const index = etiquetas.indexOf(item.etiqueta);
-        const importeAbs = Math.abs(item.importe);
-        if (index === -1) {
-            etiquetas.push(item.etiqueta);
-            montos.push(importeAbs);
-        } else {
-            montos[index] += importeAbs;
-        }
-    });
-
-    new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: etiquetas,
-            datasets: [{
-                label: label,
-                data: montos,
-                backgroundColor: etiquetas.map(et => etiquetasColores[et] || '#ccc')
-            }]
-        }
-    });
-}
 
 function filtrarGastosPorEtiqueta(etiqueta, data) {
     const gastosFiltrados = data.filter(gasto => gasto.etiqueta === etiqueta);

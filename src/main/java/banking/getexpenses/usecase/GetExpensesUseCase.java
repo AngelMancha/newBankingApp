@@ -14,8 +14,8 @@ public class GetExpensesUseCase implements GetExpensesUseCaseInterface {
     private final OperacionesRepository operacionesRepository;
 
     @Override
-    public List<Operacion> execute() {
-        List<Operacion> operaciones = operacionesRepository.findAllWithNegativeImporte();
+    public List<Operacion> execute(String year) {
+        List<Operacion> operaciones = operacionesRepository.findAllWithNegativeImporte(year);
         System.out.println("Expenses processed");
         return operaciones;
     }

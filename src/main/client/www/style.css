@@ -51,9 +51,19 @@ table {
     border-radius: 15px;
 }
 
-th, td {
+th {
     border: 1px solid #ddd;
-    border-radius: 15px;
+    border-radius: 0 0 15px 15px;
+    padding: 8px;
+    font-weight: bold;
+    text-align: center;
+        font-family: 'Cormorant Garamond', serif;
+
+
+}
+td {
+    border: 1px solid #ddd;
+    border-radius:15px;
     padding: 8px;
     font-weight: bold;
     text-align: center;
@@ -78,7 +88,7 @@ button, #monthFilter, #yearFilter {
     border: none;
     border-radius: 20px;
     cursor: pointer;
-            font-family: 'Cormorant Garamond', serif;
+    font-family: 'Cormorant Garamond', serif;
 
 }
 
@@ -231,4 +241,14 @@ select {
 
 #uploadIcon:hover {
     color: #007bff;
+}
+#monthlyExpensesChart, #monthlyIncomesChart {
+    width: 100% !important;
+    height: auto !important;
+}
+
+#monthly-expenses, #monthly-incomes {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
 }

@@ -1,4 +1,4 @@
-package banking.getexpenses.controller;
+package banking.getincome.controller;
 
 import banking.common.repository.model.Operacion;
 import banking.getincome.usecase.GetIncomeUseCaseInterface;

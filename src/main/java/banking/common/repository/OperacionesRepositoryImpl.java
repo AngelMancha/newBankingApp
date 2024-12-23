@@ -1,6 +1,7 @@
 package banking.common.repository;
 
 import banking.common.repository.model.Operacion;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -81,11 +82,17 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
     }
 
     @Override
-    public List<Operacion> findAllWithNegativeImporte() {
-        String selectSql = "SELECT * FROM " + tableName + " WHERE importe < 0 AND etiqueta != 'ASUMIDO'";
+    public List<Operacion> findAllWithNegativeImporte(String yearJson) {
+        String selectSql = "SELECT * FROM " + tableName + " WHERE importe < 0 AND etiqueta != 'ASUMIDO' AND EXTRACT(YEAR FROM fecha_operacion) = ?";
         List<Operacion> operaciones = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(url, user, password);
              PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
+
+            // Parse the JSON string to extract the year
+            JSONObject jsonObject = new JSONObject(yearJson);
+            int year = jsonObject.getInt("year");
+
+            selectStatement.setInt(1, year);
 
             ResultSet rs = selectStatement.executeQuery();
             while (rs.next()) {
@@ -105,7 +112,7 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
 
     @Override
     public List<Operacion> findAllWithPositiveImporte() {
-        String selectSql = "SELECT * FROM " + tableName + " WHERE importe > 0 AND etiqueta != 'ASUMIDO'";
+        String selectSql = "SELECT * FROM " + tableName + " WHERE importe > 0 AND etiqueta != 'ASUMIDO' AND concepto NOT LIKE '%TRANSFERENCIA DE OPEN DIGITAL SERVICES SL%' AND concepto NOT LIKE '%LIQUIDACION CUENTA%'";
         List<Operacion> operaciones = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(url, user, password);
              PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
@@ -175,6 +182,59 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
                 }
                 operacion.setConcepto(newConcepto);
 
+                operaciones.add(operacion);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return operaciones;
+    }
+
+    @Override
+    public List<Operacion> findAllWithPayrollTag(String yearJson) {
+        String selectSql = "SELECT * FROM " + tableName + " WHERE concepto LIKE '%TRANSFERENCIA DE OPEN DIGITAL SERVICES SL%'  AND EXTRACT(YEAR FROM fecha_operacion) = ?";
+        List<Operacion> operaciones = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(url, user, password);
+             PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
+
+            // Parse the JSON string to extract the year
+            JSONObject jsonObject = new JSONObject(yearJson);
+            int year = jsonObject.getInt("year");
+
+            selectStatement.setInt(1, year);
+
+
+            ResultSet rs = selectStatement.executeQuery();
+            while (rs.next()) {
+                Operacion operacion = new Operacion();
+                operacion.setFechaOperacion(rs.getTimestamp("fecha_operacion"));
+                operacion.setImporte(rs.getDouble("importe"));
+                operacion.setConcepto(rs.getString("concepto"));
+                operacion.setEtiqueta(rs.getString("etiqueta"));
+                operaciones.add(operacion);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return operaciones;
+    }
+
+    @Override
+    public List<Operacion> findAllWithInterestTag() {
+        String selectSql = "SELECT * FROM " + tableName + " WHERE concepto LIKE 'LIQUIDACION CUENTA'";
+        List<Operacion> operaciones = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(url, user, password);
+             PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
+
+            ResultSet rs = selectStatement.executeQuery();
+            while (rs.next()) {
+                Operacion operacion = new Operacion();
+                operacion.setFechaOperacion(rs.getTimestamp("fecha_operacion"));
+                operacion.setImporte(rs.getDouble("importe"));
+                operacion.setConcepto(rs.getString("concepto"));
+                operacion.setEtiqueta(rs.getString("etiqueta"));
                 operaciones.add(operacion);
             }
 

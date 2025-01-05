@@ -252,3 +252,56 @@ select {
     max-width: 1000px;
     margin: 0 auto;
 }
+
+
+/* Estilo para el formulario de subida */
+#uploadForm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+
+}
+
+#uploadForm label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#uploadForm input[type="text"],
+#uploadForm input[type="number"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    width:70px;
+}
+
+#uploadForm input[type="file"] {
+    margin-top: 10px;
+}
+
+#uploadForm button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#uploadForm button:hover {
+    background-color: #0056b3;
+}
+
+#fileIcon {
+    margin-left: 20px; /* Adjust the value as needed */
+    cursor: pointer;
+    font-size: 1.5em; /* Adjust the size as needed */
+}

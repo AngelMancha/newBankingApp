@@ -19,8 +19,6 @@
         <select id="monthFilter" class="filter-select" onchange="filtrarPorMes()"></select>
         <label for="yearFilter">Año:</label>
         <select id="yearFilter" class="filter-select" onchange="filtrarPorMes()"></select>
-        <button id="clearFilterButton">Clear Filter</button>
-        <input type="file" id="fileInput" style="display: none;" />
         <i id="uploadIcon" class="fas fa-upload"></i>
 
     </div>
@@ -37,6 +35,26 @@
         <p id="progressText">0%</p>
     </div>
 </div>
+
+<form id="uploadForm" style="display: none;">
+    <label for="fechaNombre">Nombre columna Fecha:</label>
+    <input type="text" id="fechaNombre" name="fechaNombre" value="Fecha valor" required>
+    <label for="fechaCelda">Nº:</label>
+    <input type="number" id="fechaCelda" name="fechaCelda" value="3" required>
+    <label for="conceptoNombre">Nombre columna Concepto:</label>
+    <input type="text" id="conceptoNombre" name="conceptoNombre" value="Concepto" required>
+    <label for="conceptoCelda">Nº:</label>
+    <input type="number" id="conceptoCelda" name="conceptoCelda" value="5" required>
+    <label for="importeNombre">Nombre columna Importe:</label>
+    <input type="text" id="importeNombre" name="importeNombre" value="Importe" required>
+    <label for="importeCelda">Nº:</label>
+    <input type="number" id="importeCelda" name="importeCelda" value="7" required>
+    <label for="headerRow">Nº fila de cabeceras:</label>
+    <input type="number" id="headerRow" name="headerRow" value="10" required>
+    <input type="file" id="fileInput" name="file" required style="display: none;" >
+    <i id="fileIcon" class="fas fa-file"></i>
+    <button type="submit">Upload</button>
+</form>
 
 <section id="gastos-y-grafico">
     <section id="gastos">

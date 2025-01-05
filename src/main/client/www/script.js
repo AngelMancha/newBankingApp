@@ -10,7 +10,6 @@ window.onload = () => {
         document.getElementById('mergeModal').style.display = 'none';
     });
 
-    document.getElementById('clearFilterButton').addEventListener('click', clearFilters);
 
     window.addEventListener('click', (event) => {
         if (event.target == document.getElementById('mergeModal')) {
@@ -19,15 +18,7 @@ window.onload = () => {
     });
 };
 
-function clearFilters() {
-    document.getElementById('monthFilter').value = '';
-    document.getElementById('yearFilter').value = '';
-    document.cookie = 'selectedMonth=;path=/;expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    document.cookie = 'selectedYear=;path=/;expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    fetchDataAndGenerateCharts();
-        fetchMonthylyIncome();
-        fetchMonthlyExpenses();
-}
+
 
 const etiquetasIconos = {
     "Restauracion": "fa-utensils",
@@ -579,14 +570,37 @@ function filtrarGastosPorEtiqueta(etiqueta, data) {
 }
 // script.js
 document.getElementById('uploadIcon').addEventListener('click', () => {
+    document.getElementById('uploadForm').style.display = 'block';
+});
+
+
+document.getElementById('fileIcon').addEventListener('click', () => {
     document.getElementById('fileInput').click();
 });
 
-document.getElementById('fileInput').addEventListener('change', (event) => {
-    const file = event.target.files[0];
+
+
+document.getElementById('uploadForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
     if (file) {
         const formData = new FormData();
         formData.append('file', file);
+
+        // Capture form values
+        const xlsConfigurationDto = {
+            fechaNombre: document.getElementById('fechaNombre').value,
+            fechaCelda: document.getElementById('fechaCelda').value,
+            conceptoNombre: document.getElementById('conceptoNombre').value,
+            conceptoCelda: document.getElementById('conceptoCelda').value,
+            importeNombre: document.getElementById('importeNombre').value,
+            importeCelda: document.getElementById('importeCelda').value,
+            headerRow: document.getElementById('headerRow').value
+        };
+
+        formData.append('xlsConfigurationDto', new Blob([JSON.stringify(xlsConfigurationDto)], { type: 'application/json' }));
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'http://localhost:8080/banking/upload', true);
@@ -617,7 +631,6 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
         xhr.send(formData);
     }
 });
-
 document.getElementById('closeUploadModal').addEventListener('click', () => {
     document.getElementById('uploadModal').style.display = 'none';
 });

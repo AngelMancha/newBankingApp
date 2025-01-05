@@ -1,6 +1,7 @@
 package banking.gettransactions.usecase;
 
 import banking.common.repository.OperacionesRepository;
+import banking.common.repository.model.xlsConfigurationDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -22,10 +23,16 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
     private final OperacionesRepository operacionesRepository;
 
     @Override
-    public void execute(byte[] file) {
-        int startRow = 11; // 0-based index, so row 12 is index 11
-        int startColumn = 1; // Column B is index 1
-        int endColumn = 9; // Column J is index 9
+    public void execute(byte[] file, xlsConfigurationDto request) {
+        int headerRow = Integer.parseInt(request.getHeaderRow());
+        int startColumn = 1;
+        int endColumn = 10;
+        String fechaNombre = request.getFechaNombre();
+        String conceptoNombre = request.getConceptoNombre();
+        String importeNombre = request.getImporteNombre();
+        int fechaCelda = Integer.parseInt(request.getFechaCelda());
+        int conceptoCelda = Integer.parseInt(request.getConceptoCelda());
+        int importeCelda = Integer.parseInt(request.getImporteCelda());
 
         try (ByteArrayInputStream bais = new ByteArrayInputStream(file);
              Workbook workbook = new XSSFWorkbook(bais)) {
@@ -39,12 +46,12 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
 
-                if (currentRow == 9) {
+                if (currentRow == headerRow - 1) {
                     namesRow = rowIterator.next();
                     currentRow++;
                 }
 
-                if (currentRow >= startRow) {
+                if (currentRow >= headerRow + 1) {
                     JSONObject jsonObject = new JSONObject();
                     String fechaOperacion = null;
                     Double importe = null;
@@ -53,7 +60,7 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                     String original = "yes";
 
                     for (int col = startColumn; col <= endColumn; col++) {
-                        if (col != 2 && col != 1 && col != 4 && col != 6 && col != 8 && col != 9) {
+                        if (col == fechaCelda || col == conceptoCelda || col == importeCelda) {
                             Cell cell = row.getCell(col);
                             Cell cellName = namesRow.getCell(col);
                             String cellValue = getCellValueAsString(cell);
@@ -61,17 +68,12 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
 
                             jsonObject.put(cellDescription, cellValue);
 
-                            switch (cellDescription.toLowerCase()) {
-                                case "fecha valor":
-                                    fechaOperacion = cellValue.isEmpty() ? null : cellValue;
-                                    break;
-                                case "importe":
-                                    importe = cellValue.isEmpty() ? null : Double.parseDouble(cellValue);
-                                    break;
-                                case "concepto":
-                                    concepto = cellValue.isEmpty() ? null : cellValue;
-                                    System.out.println(concepto);
-                                    break;
+                            if (cellDescription.equalsIgnoreCase(fechaNombre)) {
+                                fechaOperacion = cellValue.isEmpty() ? null : cellValue;
+                            } else if (cellDescription.equalsIgnoreCase(importeNombre)) {
+                                importe = cellValue.isEmpty() ? null : Double.parseDouble(cellValue);
+                            } else if (cellDescription.equalsIgnoreCase(conceptoNombre)) {
+                                concepto = cellValue.isEmpty() ? null : cellValue;
                             }
 
                            if (concepto != null) {

@@ -17,7 +17,6 @@ public class GetPayrollController {
     @PostMapping("/get_payroll")
     public ResponseEntity<Year> getExpenses(@RequestBody String year) {
         Year income = getPayrollInterface.execute(year);
-        System.out.println(("hola hocho"));
         return ResponseEntity.ok(income);
     }
 }

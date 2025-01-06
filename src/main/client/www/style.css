@@ -30,6 +30,9 @@ header {
     margin-bottom: 20px;
 }
 
+
+
+
 #gastos-y-grafico{
     display: flex;
     flex-direction: column;
@@ -154,7 +157,7 @@ select {
     width: 35%;
 }
 
-#grafico-barras-section {
+#grafico-barras-section, #grafico-barras-section-anual {
     padding-top: 4rem;
     width: 50%;
 }

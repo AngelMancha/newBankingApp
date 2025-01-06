@@ -1,5 +1,6 @@
 window.onload = () => {
     fetchDataAndGenerateCharts();
+    fetchDataAndGenerateChartsAnuales();
     fetchMonthylyIncome();
     fetchMonthlyExpenses();
     cargarOpcionesMes();
@@ -107,18 +108,20 @@ function cargarOpcionesMes() {
     });
 
     if (selectedMonthCookie !== null && selectedYearCookie !== null) {
-        fetchDataAndGenerateCharts(parseInt(selectedMonthCookie), parseInt(selectedYearCookie));
+        fetchDataAndGenerateCharts();
+            fetchDataAndGenerateChartsAnuales();
             fetchMonthylyIncome();
             fetchMonthlyExpenses();
     }
 }function filtrarPorMes() {
-    const selectedMonth = parseInt(document.getElementById('monthFilter').value);
+    const selectedMonth = parseInt(document.getElementById('monthFilter').value) + 1;
     const selectedYear = parseInt(document.getElementById('yearFilter').value);
     document.cookie = `selectedMonth=${selectedMonth};path=/;expires=${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString()}`;
     document.cookie = `selectedYear=${selectedYear};path=/;expires=${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString()}`;
-    fetchDataAndGenerateCharts(selectedMonth, selectedYear);
-        fetchMonthylyIncome();
-        fetchMonthlyExpenses();
+    fetchDataAndGenerateCharts();
+    fetchDataAndGenerateChartsAnuales();
+    fetchMonthylyIncome();
+    fetchMonthlyExpenses();
 }
 
 function fetchMonthylyIncome() {
@@ -169,6 +172,7 @@ function fetchDataAndGenerateCharts(mesSeleccionado = null, anoSeleccionado = nu
     const incomeUrl = 'http://localhost:8080/banking/get_income';
 
     const requestBody = {
+        month: getCookie('selectedMonth'),
         year: getCookie('selectedYear')
     };
 
@@ -180,22 +184,19 @@ function fetchDataAndGenerateCharts(mesSeleccionado = null, anoSeleccionado = nu
             },
             body: JSON.stringify(requestBody)
         }).then(response => response.json()),
-        fetch(incomeUrl).then(response => response.json())
+        fetch(incomeUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+         }).then(response => response.json())
     ])
     .then(([expensesData, incomeData]) => {
         expensesData.sort((a, b) => new Date(a.fechaOperacion) - new Date(b.fechaOperacion));
         incomeData.sort((a, b) => new Date(a.fechaOperacion) - new Date(b.fechaOperacion));
 
-        if (mesSeleccionado !== null && anoSeleccionado !== null) {
-            expensesData = expensesData.filter(gasto => {
-                const date = new Date(gasto.fechaOperacion);
-                return date.getMonth() === mesSeleccionado && date.getFullYear() === anoSeleccionado;
-            });
-            incomeData = incomeData.filter(ingreso => {
-                const date = new Date(ingreso.fechaOperacion);
-                return date.getMonth() === mesSeleccionado && date.getFullYear() === anoSeleccionado;
-            });
-        }
+
 
         cargarDatos('gastos-lista', expensesData, 'expense');
         cargarDatos('ingresos-lista', incomeData, 'income');
@@ -634,3 +635,136 @@ document.getElementById('uploadForm').addEventListener('submit', (event) => {
 document.getElementById('closeUploadModal').addEventListener('click', () => {
     document.getElementById('uploadModal').style.display = 'none';
 });
+
+
+function fetchDataAndGenerateChartsAnuales(mesSeleccionado = null, anoSeleccionado = null) {
+    const expensesUrl = 'http://localhost:8080/banking/get_expenses_anuales';
+
+    const requestBody = {
+        month: getCookie('selectedMonth'),
+        year: getCookie('selectedYear')
+    };
+
+
+    fetch(expensesUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+    }).then(response => response.json())
+    .then(data => {
+        const expensesData = data; // Ensure data is an array
+        if (Array.isArray(expensesData)) {
+            console.log("LAS ANUALES SON: ");
+            console.log(expensesData);
+            expensesData.sort((a, b) => new Date(a.fechaOperacion) - new Date(b.fechaOperacion));
+            generarEstadisticasAnuales('grafico-gastos-anual', expensesData, 'Gastos Anuales por Etiqueta (€)');
+        } else {
+            console.error('Error: expensesData is not an array');
+        }
+    })
+    .catch(error => {
+        console.error('Error al obtener los datos:', error);
+    });
+}
+
+
+function generarEstadisticasAnuales(canvasId, data, label) {
+    const canvasContainer = document.getElementById(canvasId).parentNode;
+    canvasContainer.removeChild(document.getElementById(canvasId));
+
+    const newCanvas = document.createElement('canvas');
+    newCanvas.id = canvasId;
+    canvasContainer.appendChild(newCanvas);
+
+    const ctx = newCanvas.getContext('2d');
+    const etiquetas = [];
+    const montos = [];
+    let totalGasto = 0;
+
+    data.forEach(item => {
+        const index = etiquetas.indexOf(item.etiqueta);
+        const importeAbs = Math.abs(item.importe);
+        totalGasto += importeAbs;
+        if (index === -1) {
+            etiquetas.push(item.etiqueta);
+            montos.push(importeAbs);
+        } else {
+            montos[index] += importeAbs;
+        }
+    });
+
+    let totalGastoElement = document.getElementById('totalGastoAnual');
+
+
+
+    if (!totalGastoElement) {
+        totalGastoElement = document.createElement('div');
+        totalGastoElement.id = 'totalGastoAnual';
+        totalGastoElement.style.textAlign = 'center';
+        totalGastoElement.style.fontWeight = 'bold';
+        totalGastoElement.style.marginBottom = '20px';
+        totalGastoElement.style.fontSize = '1.5em';
+        canvasContainer.insertBefore(totalGastoElement, newCanvas);
+    }
+
+    const selectedYear = document.getElementById('yearFilter').value;
+
+    totalGastoElement.textContent = `Gasto total en ${selectedYear}: ${totalGasto.toFixed(2)}€`;
+
+    const maxMonto = Math.max(...montos);
+    const stepSize = 100;
+    let maxY = Math.ceil(maxMonto / stepSize) * stepSize;
+
+    if (maxMonto >= maxY - 20) {
+        maxY += stepSize;
+    }
+
+    const backgroundColors = etiquetas.map(et => etiquetasColores[et] || '#ccc');
+    const borderColors = backgroundColors.map(color => darkenColor(color, 20));
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: etiquetas,
+            datasets: [{
+                label: "",
+                data: montos,
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
+                borderWidth: 3
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: false
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value) => value.toFixed(2) + '€',
+                    color: 'black'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: maxY,
+                    ticks: {
+                        stepSize: stepSize
+                    }
+                }
+            },
+            onClick: (event, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const etiquetaSeleccionada = etiquetas[index];
+                    filtrarGastosPorEtiqueta(etiquetaSeleccionada, data);
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+}

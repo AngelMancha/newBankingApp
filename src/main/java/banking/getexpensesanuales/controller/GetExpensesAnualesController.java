@@ -2,7 +2,7 @@ package banking.getexpenses.controller;
 
 import banking.common.repository.model.FechaDto;
 import banking.common.repository.model.Operacion;
-import banking.getexpenses.usecase.GetExpensesUseCaseInterface;
+import banking.getexpensesanuales.usecase.GetExpensesAnualesUseCaseInterface;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +13,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/banking")
 @CrossOrigin(origins = "http://localhost:3000")
-public class GetExpensesController {
+public class GetExpensesAnualesController {
 
-    private final GetExpensesUseCaseInterface getExpensesUseCase;
+    private final GetExpensesAnualesUseCaseInterface getExpensesAnualesUseCase;
 
-    @PostMapping("/get_expenses")
+    @PostMapping("/get_expenses_anuales")
     public ResponseEntity<List<Operacion>> getExpenses(@RequestBody FechaDto fecha) {
         String year = fecha.getYear();
-        String month = fecha.getMonth();
-        List<Operacion> operaciones = getExpensesUseCase.execute(year, month);
+        List<Operacion> operaciones = getExpensesAnualesUseCase.execute(year);
         return ResponseEntity.ok(operaciones);
     }
 }

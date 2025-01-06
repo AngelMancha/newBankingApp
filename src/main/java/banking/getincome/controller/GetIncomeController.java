@@ -1,13 +1,11 @@
 package banking.getincome.controller;
 
+import banking.common.repository.model.FechaDto;
 import banking.common.repository.model.Operacion;
 import banking.getincome.usecase.GetIncomeUseCaseInterface;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,9 +17,11 @@ public class GetIncomeController {
 
     private final GetIncomeUseCaseInterface getIncomeUseCase;
 
-    @GetMapping("/get_income")
-    public ResponseEntity<List<Operacion>> getExpenses() {
-        List<Operacion> operaciones = getIncomeUseCase.execute();
+    @PostMapping("/get_income")
+    public ResponseEntity<List<Operacion>> getExpenses(@RequestBody FechaDto fecha) {
+        String year = fecha.getYear();
+        String month = fecha.getMonth();
+        List<Operacion> operaciones = getIncomeUseCase.execute(year, month);
         return ResponseEntity.ok(operaciones);
     }
 }

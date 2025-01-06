@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface GetExpensesUseCaseInterface {
 
-    List<Operacion> execute(String year);
+    List<Operacion> execute(String year, String month);
 }

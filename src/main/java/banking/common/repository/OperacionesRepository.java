@@ -12,9 +12,13 @@ public interface OperacionesRepository {
 
     void updateTag(Timestamp fechaOperacion, Double importe, String concepto, String nuevaEtiqueta);
 
+    List<Operacion> findAllWithNegativeImporte(String year, String month);
+
     List<Operacion> findAllWithNegativeImporte(String year);
 
-    List<Operacion> findAllWithPositiveImporte();
+    List<Operacion> findAllWithPositiveImporte(String year, String month);
+
+    List<Operacion> findAllWithPositiveImporte(String year);
 
     List<Operacion> findAllWithOriginalTag();
 

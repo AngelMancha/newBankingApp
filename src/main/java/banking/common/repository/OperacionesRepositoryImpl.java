@@ -80,17 +80,43 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
             e.printStackTrace();
         }
     }
+    @Override
+    public List<Operacion> findAllWithNegativeImporte(String yearString, String monthString) {
+        String selectSql = "SELECT * FROM " + tableName + " WHERE importe < 0 AND etiqueta != 'ASUMIDO' AND EXTRACT(YEAR FROM fecha_operacion) = ? AND EXTRACT(MONTH FROM fecha_operacion) = ?";
+        List<Operacion> operaciones = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(url, user, password);
+             PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
+
+            int year = Integer.parseInt(yearString);
+            int month = Integer.parseInt(monthString);
+
+            selectStatement.setInt(1, year);
+            selectStatement.setInt(2, month);
+
+            ResultSet rs = selectStatement.executeQuery();
+            while (rs.next()) {
+                Operacion operacion = new Operacion();
+                operacion.setFechaOperacion(rs.getTimestamp("fecha_operacion"));
+                operacion.setImporte(rs.getDouble("importe"));
+                operacion.setConcepto(rs.getString("concepto"));
+                operacion.setEtiqueta(rs.getString("etiqueta"));
+                operaciones.add(operacion);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return operaciones;
+    }
 
     @Override
-    public List<Operacion> findAllWithNegativeImporte(String yearJson) {
+    public List<Operacion> findAllWithNegativeImporte(String yearString) {
         String selectSql = "SELECT * FROM " + tableName + " WHERE importe < 0 AND etiqueta != 'ASUMIDO' AND EXTRACT(YEAR FROM fecha_operacion) = ?";
         List<Operacion> operaciones = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(url, user, password);
              PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
 
-            // Parse the JSON string to extract the year
-            JSONObject jsonObject = new JSONObject(yearJson);
-            int year = jsonObject.getInt("year");
+            int year = Integer.parseInt(yearString);
 
             selectStatement.setInt(1, year);
 
@@ -111,11 +137,44 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
     }
 
     @Override
-    public List<Operacion> findAllWithPositiveImporte() {
-        String selectSql = "SELECT * FROM " + tableName + " WHERE importe > 0 AND etiqueta != 'ASUMIDO' AND concepto NOT LIKE '%TRANSFERENCIA DE OPEN DIGITAL SERVICES SL%' AND concepto NOT LIKE '%LIQUIDACION CUENTA%'";
+    public List<Operacion> findAllWithPositiveImporte(String yearString, String monthString) {
+        String selectSql = "SELECT * FROM " + tableName + " WHERE importe > 0 AND etiqueta != 'ASUMIDO' AND concepto NOT LIKE '%TRANSFERENCIA DE OPEN DIGITAL SERVICES SL%' AND concepto NOT LIKE '%LIQUIDACION CUENTA%' AND EXTRACT(YEAR FROM fecha_operacion) = ? AND EXTRACT(MONTH FROM fecha_operacion) = ?";
         List<Operacion> operaciones = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(url, user, password);
              PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
+
+            int year = Integer.parseInt(yearString);
+            int month = Integer.parseInt(monthString);
+
+            selectStatement.setInt(1, year);
+            selectStatement.setInt(2, month);
+
+            ResultSet rs = selectStatement.executeQuery();
+            while (rs.next()) {
+                Operacion operacion = new Operacion();
+                operacion.setFechaOperacion(rs.getTimestamp("fecha_operacion"));
+                operacion.setImporte(rs.getDouble("importe"));
+                operacion.setConcepto(rs.getString("concepto"));
+                operacion.setEtiqueta(rs.getString("etiqueta"));
+                operaciones.add(operacion);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return operaciones;
+    }
+
+    @Override
+    public List<Operacion> findAllWithPositiveImporte(String yearString) {
+        String selectSql = "SELECT * FROM " + tableName + " WHERE importe > 0 AND etiqueta != 'ASUMIDO' AND concepto NOT LIKE '%TRANSFERENCIA DE OPEN DIGITAL SERVICES SL%' AND concepto NOT LIKE '%LIQUIDACION CUENTA%' AND EXTRACT(YEAR FROM fecha_operacion) = ?";
+        List<Operacion> operaciones = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(url, user, password);
+             PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
+
+            int year = Integer.parseInt(yearString);
+
+            selectStatement.setInt(1, year);
 
             ResultSet rs = selectStatement.executeQuery();
             while (rs.next()) {

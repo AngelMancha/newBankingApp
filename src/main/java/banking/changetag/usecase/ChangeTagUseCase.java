@@ -7,12 +7,24 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
+/**
+ * Service class for changing the tag of an operation.
+ */
 @Service
 @RequiredArgsConstructor
 public class ChangeTagUseCase implements ChangeTagUseCaseInterface {
 
     private final OperacionesRepository operacionesRepository;
 
+    /**
+     * Executes the change tag use case.
+     *
+     * @param fechaOperacion the date of the operation
+     * @param importe        the amount of the operation
+     * @param concepto       the concept of the operation
+     * @param etiqueta       the new tag for the operation
+     * @return the updated operation
+     */
     @Override
     public Operacion execute(String fechaOperacion, Double importe, String concepto, String etiqueta) {
         Timestamp fechaOperacionTimestamp = Timestamp.valueOf(fechaOperacion);
@@ -25,6 +37,5 @@ public class ChangeTagUseCase implements ChangeTagUseCaseInterface {
         nuevaOperacion.setConcepto(concepto);
         nuevaOperacion.setEtiqueta(etiqueta);
         return nuevaOperacion;
-
     }
 }

@@ -11,6 +11,9 @@ import java.util.List;
 
 import static banking.gettransactions.usecase.GetTransactionsUseCase.findCardNumber;
 
+/**
+ * Implementation of the OperacionesRepository interface for managing operations in the database.
+ */
 @Repository
 public class OperacionesRepositoryImpl implements OperacionesRepository {
 
@@ -26,6 +29,14 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
     @Value("${spring.datasource.table-name}")
     private String tableName;
 
+    /**
+     * Counts the number of operations with the specified date, amount, and concept.
+     *
+     * @param fechaOperacion the date of the operation
+     * @param importe        the amount of the operation
+     * @param concepto       the concept of the operation
+     * @return the count of matching operations
+     */
     @Override
     public int countByFechaOperacionAndImporteAndConcepto(Timestamp fechaOperacion, Double importe, String concepto) {
         String checkSql = "SELECT COUNT(*) FROM " + tableName + " WHERE fecha_operacion = ? AND importe = ? AND concepto = ?";
@@ -46,6 +57,15 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
         }
     }
 
+    /**
+     * Inserts a new operation into the database.
+     *
+     * @param fechaOperacion the date of the operation
+     * @param importe        the amount of the operation
+     * @param concepto       the concept of the operation
+     * @param etiqueta       the tag of the operation
+     * @param original       the original status of the operation
+     */
     @Override
     public void insertOperacion(Timestamp fechaOperacion, Double importe, String concepto, String etiqueta, String original) {
         String insertSql = "INSERT INTO " + tableName + " (fecha_operacion, importe, concepto, etiqueta, original) VALUES (?, ?, ?, ?, ?)";
@@ -64,6 +84,14 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
         }
     }
 
+    /**
+     * Updates the tag of an operation in the database.
+     *
+     * @param fechaOperacion the date of the operation
+     * @param importe        the amount of the operation
+     * @param concepto       the concept of the operation
+     * @param nuevaEtiqueta  the new tag of the operation
+     */
     @Override
     public void updateTag(Timestamp fechaOperacion, Double importe, String concepto, String nuevaEtiqueta) {
         String updateSql = "UPDATE " + tableName + " SET etiqueta = ? WHERE importe = ? AND concepto = ?";
@@ -80,6 +108,14 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Finds all operations with a negative amount for the specified year and month.
+     *
+     * @param yearString  the year of the operations
+     * @param monthString the month of the operations
+     * @return a list of operations with a negative amount
+     */
     @Override
     public List<Operacion> findAllWithNegativeImporte(String yearString, String monthString) {
         String selectSql = "SELECT * FROM " + tableName + " WHERE importe < 0 AND etiqueta != 'ASUMIDO' AND EXTRACT(YEAR FROM fecha_operacion) = ? AND EXTRACT(MONTH FROM fecha_operacion) = ?";
@@ -109,6 +145,12 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
         return operaciones;
     }
 
+    /**
+     * Finds all operations with a negative amount for the specified year.
+     *
+     * @param yearString the year of the operations
+     * @return a list of operations with a negative amount
+     */
     @Override
     public List<Operacion> findAllWithNegativeImporte(String yearString) {
         String selectSql = "SELECT * FROM " + tableName + " WHERE importe < 0 AND etiqueta != 'ASUMIDO' AND EXTRACT(YEAR FROM fecha_operacion) = ?";
@@ -136,6 +178,13 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
         return operaciones;
     }
 
+    /**
+     * Finds all operations with a positive amount for the specified year and month.
+     *
+     * @param yearString  the year of the operations
+     * @param monthString the month of the operations
+     * @return a list of operations with a positive amount
+     */
     @Override
     public List<Operacion> findAllWithPositiveImporte(String yearString, String monthString) {
         String selectSql = "SELECT * FROM " + tableName + " WHERE importe > 0 AND etiqueta != 'ASUMIDO' AND concepto NOT LIKE '%TRANSFERENCIA DE OPEN DIGITAL SERVICES SL%' AND concepto NOT LIKE '%LIQUIDACION CUENTA%' AND EXTRACT(YEAR FROM fecha_operacion) = ? AND EXTRACT(MONTH FROM fecha_operacion) = ?";
@@ -165,6 +214,12 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
         return operaciones;
     }
 
+    /**
+     * Finds all operations with a positive amount for the specified year.
+     *
+     * @param yearString the year of the operations
+     * @return a list of operations with a positive amount
+     */
     @Override
     public List<Operacion> findAllWithPositiveImporte(String yearString) {
         String selectSql = "SELECT * FROM " + tableName + " WHERE importe > 0 AND etiqueta != 'ASUMIDO' AND concepto NOT LIKE '%TRANSFERENCIA DE OPEN DIGITAL SERVICES SL%' AND concepto NOT LIKE '%LIQUIDACION CUENTA%' AND EXTRACT(YEAR FROM fecha_operacion) = ?";
@@ -192,6 +247,11 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
         return operaciones;
     }
 
+    /**
+     * Finds all operations with the original tag.
+     *
+     * @return a list of operations with the original tag
+     */
     @Override
     public List<Operacion> findAllWithOriginalTag() {
         String selectSql = "SELECT * FROM " + tableName + " WHERE original = 'yes'";
@@ -215,6 +275,11 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
         return operaciones;
     }
 
+    /**
+     * Performs an auxiliary database operation.
+     *
+     * @return a list of operations after performing the auxiliary operation
+     */
     @Override
     public List<Operacion> auxiliarDbOperation() {
         String selectSql = "SELECT * FROM " + tableName;
@@ -250,6 +315,12 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
         return operaciones;
     }
 
+    /**
+     * Finds all operations with the payroll tag for the specified year.
+     *
+     * @param yearJson the JSON string containing the year of the operations
+     * @return a list of operations with the payroll tag
+     */
     @Override
     public List<Operacion> findAllWithPayrollTag(String yearJson) {
         String selectSql = "SELECT * FROM " + tableName + " WHERE concepto LIKE '%TRANSFERENCIA DE OPEN DIGITAL SERVICES SL%'  AND EXTRACT(YEAR FROM fecha_operacion) = ?";
@@ -262,7 +333,6 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
             int year = jsonObject.getInt("year");
 
             selectStatement.setInt(1, year);
-
 
             ResultSet rs = selectStatement.executeQuery();
             while (rs.next()) {
@@ -280,6 +350,11 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
         return operaciones;
     }
 
+    /**
+     * Finds all operations with the interest tag.
+     *
+     * @return a list of operations with the interest tag
+     */
     @Override
     public List<Operacion> findAllWithInterestTag() {
         String selectSql = "SELECT * FROM " + tableName + " WHERE concepto LIKE 'LIQUIDACION CUENTA'";
@@ -302,5 +377,4 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
         }
         return operaciones;
     }
-
 }

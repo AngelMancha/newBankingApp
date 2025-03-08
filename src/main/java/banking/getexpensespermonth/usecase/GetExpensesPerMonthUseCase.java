@@ -8,12 +8,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Service class for getting expenses information per month.
+ */
 @RequiredArgsConstructor
 @Service
 public class GetExpensesPerMonthUseCase implements GetExpensesPerMonthUseCasInterface {
 
     private final OperacionesRepository operacionesRepository;
 
+    /**
+     * Executes the use case to get expenses information for a specified year.
+     *
+     * @param year the year for which expenses information is requested
+     * @return the expenses information for the specified year
+     */
     @Override
     public Year execute(String year) {
         List<Operacion> operaciones = operacionesRepository.findAllWithNegativeImporte(year);

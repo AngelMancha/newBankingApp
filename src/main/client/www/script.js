@@ -1,8 +1,4 @@
 window.onload = () => {
-    fetchDataAndGenerateCharts();
-    fetchDataAndGenerateChartsAnuales();
-    fetchMonthylyIncome();
-    fetchMonthlyExpenses();
     cargarOpcionesMes();
 
     document.getElementById('mergeButton').addEventListener('click', showMergeModal);
@@ -79,12 +75,17 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(';').shift();
     return null;
 }
-
 function cargarOpcionesMes() {
     const monthFilter = document.getElementById('monthFilter');
     const yearFilter = document.getElementById('yearFilter');
     const selectedMonthCookie = getCookie('selectedMonth');
     const selectedYearCookie = getCookie('selectedYear');
+
+    // Agregar opción "sin elección" al inicio del desplegable de meses
+    const noSelectionOption = document.createElement('option');
+    noSelectionOption.value = '';
+    noSelectionOption.textContent = 'sin elección';
+    monthFilter.appendChild(noSelectionOption);
 
     for (let month = 0; month < 12; month++) {
         const option = document.createElement('option');
@@ -107,18 +108,34 @@ function cargarOpcionesMes() {
         yearFilter.appendChild(option);
     });
 
-    if (selectedMonthCookie !== null && selectedYearCookie !== null) {
+    if (!isNaN(selectedMonthCookie)) {
         fetchDataAndGenerateCharts();
-            fetchDataAndGenerateChartsAnuales();
-            fetchMonthylyIncome();
-            fetchMonthlyExpenses();
+
+    } else {
+        console.log('No se ha seleccionado un mes');
+        fetchDataAndGenerateChartsForYear();
     }
-}function filtrarPorMes() {
+
+    fetchDataAndGenerateChartsAnuales();
+    fetchMonthylyIncome();
+    fetchMonthlyExpenses();
+
+
+}
+function filtrarPorMes() {
     const selectedMonth = parseInt(document.getElementById('monthFilter').value) + 1;
     const selectedYear = parseInt(document.getElementById('yearFilter').value);
     document.cookie = `selectedMonth=${selectedMonth};path=/;expires=${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString()}`;
     document.cookie = `selectedYear=${selectedYear};path=/;expires=${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString()}`;
-    fetchDataAndGenerateCharts();
+
+    if (!isNaN(selectedMonth)) {
+        fetchDataAndGenerateCharts();
+
+    } else {
+        console.log('No se ha seleccionado un mes');
+        fetchDataAndGenerateChartsForYear();
+    }
+
     fetchDataAndGenerateChartsAnuales();
     fetchMonthylyIncome();
     fetchMonthlyExpenses();
@@ -126,7 +143,7 @@ function cargarOpcionesMes() {
 
 function fetchMonthylyIncome() {
 
-    const montlyTilesUrl = 'http://localhost:8080/banking/get_payroll';
+    const montlyTilesUrl = 'http://localhost:8080/banking/get_payroll_month ';
     const requestBody = {
         year: getCookie('selectedYear')
     };
@@ -207,6 +224,47 @@ function fetchDataAndGenerateCharts(mesSeleccionado = null, anoSeleccionado = nu
         console.error('Error al obtener los datos:', error);
     });
 }
+
+function fetchDataAndGenerateChartsForYear(mesSeleccionado = null, anoSeleccionado = null) {
+    const expensesUrl = 'http://localhost:8080/banking/get_expenses_anuales';
+    const incomeUrl = 'http://localhost:8080/banking/get_income';
+
+    const requestBody = {
+        year: getCookie('selectedYear')
+    };
+
+    Promise.all([
+        fetch(expensesUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        }).then(response => response.json()),
+        fetch(incomeUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+         }).then(response => response.json())
+    ])
+    .then(([expensesData, incomeData]) => {
+        expensesData.sort((a, b) => new Date(a.fechaOperacion) - new Date(b.fechaOperacion));
+        incomeData.sort((a, b) => new Date(a.fechaOperacion) - new Date(b.fechaOperacion));
+
+
+
+        cargarDatos('gastos-lista', expensesData, 'expense');
+        cargarDatos('ingresos-lista', incomeData, 'income');
+
+        generarEstadisticas('grafico-gastos', expensesData, 'Gastos por Etiqueta (€)');
+    })
+    .catch(error => {
+        console.error('Error al obtener los datos:', error);
+    });
+}
+
 function cargarDatos(listaId, data, type) {
     const lista = document.getElementById(listaId);
     lista.innerHTML = '';
@@ -502,9 +560,12 @@ function generarEstadisticas(canvasId, data, label) {
     }
 
     const selectedMonth = document.getElementById('monthFilter').value;
+    console.log("EL MES SELECCIONADO ES: " + selectedMonth);
     const selectedYear = document.getElementById('yearFilter').value;
-    const monthName = new Date(2024, selectedMonth).toLocaleString('default', { month: 'long' });
-
+    let monthName = '';
+    if (selectedMonth !== '') {
+        monthName = new Date(2024, selectedMonth).toLocaleString('default', { month: 'long' });
+}
     totalGastoElement.textContent = `Gasto Total en ${monthName} ${selectedYear}: ${totalGasto.toFixed(2)}€`;
 
     const maxMonto = Math.max(...montos);

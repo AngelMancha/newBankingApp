@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controller for handling requests to adjust payments.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/banking")
@@ -17,18 +20,17 @@ public class AdjustPaymentController {
 
     private final adjustPaymentUseCaseInterface adjustPaymentUseCase;
 
+    /**
+     * Endpoint to adjust payments.
+     *
+     * @param request the request body containing the details of the operations
+     * @return the adjusted operation
+     */
     @PostMapping("/adjust_payment")
     public ResponseEntity<Operacion> adjustPayment(@RequestBody AdjustPaymentRequestDto request) {
-        // Extraer datos de las operaciones
-        List<Operacion> operacionesGasto= request.getOperacionesGasto();
+        List<Operacion> operacionesGasto = request.getOperacionesGasto();
         List<Operacion> operacionesIngreso = request.getOperacionesIngreso();
-
-
-        // Llamada al caso de uso
         Operacion nuevoGasto = adjustPaymentUseCase.execute(operacionesGasto, operacionesIngreso);
-
-
-        // Respuesta exitosa
         return ResponseEntity.ok(nuevoGasto);
     }
 }

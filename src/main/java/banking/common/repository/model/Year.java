@@ -2,6 +2,9 @@ package banking.common.repository.model;
 
 import lombok.Data;
 
+/**
+ * Represents the expenses for each month of a year.
+ */
 @Data
 public class Year {
     private double january;
@@ -16,5 +19,4 @@ public class Year {
     private double october;
     private double november;
     private double december;
-
 }

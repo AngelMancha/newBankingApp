@@ -49,7 +49,7 @@ public class OperacionesRepositoryImpl implements OperacionesRepository {
 
             ResultSet rs = checkStatement.executeQuery();
             rs.next();
-            return rs.getInt(1);
+           return rs.getInt(1);
 
         } catch (SQLException e) {
             e.printStackTrace();

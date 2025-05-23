@@ -27,12 +27,14 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
         int headerRow = Integer.parseInt(request.getHeaderRow());
         int startColumn = 1;
         int endColumn = 10;
-        String fechaNombre = request.getFechaNombre();
-        String conceptoNombre = request.getConceptoNombre();
-        String importeNombre = request.getImporteNombre();
-        int fechaCelda = Integer.parseInt(request.getFechaCelda());
-        int conceptoCelda = Integer.parseInt(request.getConceptoCelda());
-        int importeCelda = Integer.parseInt(request.getImporteCelda());
+
+        int fechaColumna = Integer.parseInt(request.getFechaCelda());
+        int conceptoColumna = Integer.parseInt(request.getConceptoCelda());
+        int importeColumna = Integer.parseInt(request.getImporteCelda());
+
+        String fechaNombre = "";
+        String conceptoNombre = "";
+        String importeNombre = "";
 
         try (ByteArrayInputStream bais = new ByteArrayInputStream(file);
              Workbook workbook = new XSSFWorkbook(bais)) {
@@ -51,7 +53,7 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                     currentRow++;
                 }
 
-                if (currentRow >= headerRow + 1) {
+                if (currentRow > headerRow + 1) {
                     JSONObject jsonObject = new JSONObject();
                     String fechaOperacion = null;
                     Double importe = null;
@@ -59,8 +61,13 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                     String etiqueta = null;
                     String original = "yes";
 
+
                     for (int col = startColumn; col <= endColumn; col++) {
-                        if (col == fechaCelda || col == conceptoCelda || col == importeCelda) {
+                        if (col == fechaColumna || col == conceptoColumna || col == importeColumna) {
+
+                            fechaNombre = getCellValueAsString(namesRow.getCell(fechaColumna));
+                            conceptoNombre = getCellValueAsString(namesRow.getCell(conceptoColumna));
+                            importeNombre = getCellValueAsString(namesRow.getCell(importeColumna));
                             Cell cell = row.getCell(col);
                             Cell cellName = namesRow.getCell(col);
                             String cellValue = getCellValueAsString(cell);
@@ -76,7 +83,7 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                                 concepto = cellValue.isEmpty() ? null : cellValue;
                             }
 
-                           if (concepto != null) {
+                            if (concepto != null) {
                                 if (concepto.contains("TRANSFERENCIA A FAVOR DE MANCHA NUÑEZ ANGEL JOSE") ||
                                         concepto.contains("RECARGA TARJETA PREPAGO") ||
                                         concepto.contains("DESCARGA TARJETA PREPAGO")) {
@@ -86,7 +93,7 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
                                 } else {
                                     etiqueta = "otros";
                                 }
-                           }
+                            }
 
                             if (concepto != null) {
                                 concepto = findCardNumber(concepto);
@@ -136,7 +143,7 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
         }
     }
 
-    private static String blurCardNunmber(String cardNumber){
+    private static String blurCardNunmber(String cardNumber) {
 
         char[] cardNumberArray = cardNumber.toCharArray();
         List<String> blurredCardNumber = new ArrayList<>();
@@ -154,7 +161,7 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
 
     }
 
-    public static String findCardNumber(String concepto){
+    public static String findCardNumber(String concepto) {
         String[] words = concepto.split(" ");
         int counter = 0;
         for (String word : words) {
@@ -167,4 +174,19 @@ public class GetTransactionsUseCase implements GetTransactionsUseCaseInterface {
         }
         return String.join(" ", words);
     }
+
+    private static String getCellName(int columnNumber, int rowNumber) {
+        StringBuilder columnName = new StringBuilder();
+        while (columnNumber > 0) {
+            int remainder = (columnNumber - 1) % 26;
+            columnName.insert(0, (char) (remainder + 'A'));
+            columnNumber = (columnNumber - 1) / 26;
+        }
+        return columnName.toString() + rowNumber;
+    }
 }
+
+
+
+
+

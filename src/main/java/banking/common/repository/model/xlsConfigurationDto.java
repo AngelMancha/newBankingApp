@@ -7,10 +7,6 @@ import lombok.Data;
  */
 @Data
 public class xlsConfigurationDto {
-    /**
-     * The name of the date field.
-     */
-    private String fechaNombre;
 
     /**
      * The cell reference for the date field.
@@ -18,19 +14,9 @@ public class xlsConfigurationDto {
     private String fechaCelda;
 
     /**
-     * The name of the concept field.
-     */
-    private String conceptoNombre;
-
-    /**
      * The cell reference for the concept field.
      */
     private String conceptoCelda;
-
-    /**
-     * The name of the amount field.
-     */
-    private String importeNombre;
 
     /**
      * The cell reference for the amount field.

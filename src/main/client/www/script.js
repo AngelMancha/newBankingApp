@@ -14,37 +14,38 @@ window.onload = () => {
         }
     });
 };
-
-
-
 const etiquetasIconos = {
     "Restauracion": "fa-utensils",
     "Empresa": "fa-building",
-    "Otros": "fa-shopping-cart",
     "Ingresos": "fa-money-bill-wave",
     "Ocio": "fa-solid fa-ticket",
     "Viajes": "fa-plane",
     "Transporte": "fa-bus",
-    "Multimedia": "fa-photo-video"
+    "Multimedia": "fa-photo-video",
+    "Regalos": "fa-gift",       // Added icon for "Regalos"
+    "Caprichos": "fa-gem",      // Added icon for "Caprichos"
+    "Coche": "fa-car",           // Added icon for "Coche"
+     "Otros": "fa-shopping-cart",
 };
-
 const etiquetasColores = {
     "Ocio": "#B5655C",         // Muted Red
     "Empresa": "#8A9BA8",      // Muted Blue
     "Restauracion": "#D9A05B", // Muted Orange
     "Viajes": "#D9A5B3",       // Muted Pink
-    "Otros": "#6FAF74",        // Muted Green
     "Ingresos": "#6FA8DC",     // Muted Light Blue
     "Transporte": "#A992B0",   // Muted Purple
-    "Multimedia": "#D9C77B"    // Muted Yellow
-};
+    "Multimedia": "#D9C77B",   // Muted Yellow
+    "Regalos": "#FF69B4",      // Light Pink
+    "Caprichos": "#6FAF74",    // Pale Green
+    "Coche": "#9370DB",        // Medium Purple
+    "Otros": "#98FB98"       // Muted Green
 
+};
 let selectedExpenses = [];
 let selectedIncomes = [];
 let selectedRowForTag = null;
 let monthlyExpensesChart = null;
 let monthlyIncomesChart = null;
-
 
 function showMergeModal() {
     if (selectedExpenses.length === 0 || selectedIncomes.length === 0) {
@@ -75,6 +76,7 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(';').shift();
     return null;
 }
+
 function cargarOpcionesMes() {
     const monthFilter = document.getElementById('monthFilter');
     const yearFilter = document.getElementById('yearFilter');
@@ -122,6 +124,7 @@ function cargarOpcionesMes() {
 
 
 }
+
 function filtrarPorMes() {
     const selectedMonth = parseInt(document.getElementById('monthFilter').value) + 1;
     const selectedYear = parseInt(document.getElementById('yearFilter').value);
@@ -181,8 +184,6 @@ function fetchMonthlyExpenses() {
         createMonthlyExpensesGraph(montlyTilesData);
     })
 }
-
-
 
 function fetchDataAndGenerateCharts(mesSeleccionado = null, anoSeleccionado = null) {
     const expensesUrl = 'http://localhost:8080/banking/get_expenses';
@@ -351,7 +352,9 @@ function createMonthlyExpensesGraph(data) {
                     anchor: 'end',
                     align: 'top',
                     formatter: (value) => value.toFixed(2) + '€',
-                    color: 'black'
+                    color: 'black',
+                    rotation: window.innerWidth <= 768 ? -40 : 0 // Rotate labels for mobile
+
                 }
             }
         },
@@ -415,7 +418,9 @@ function createMonthlyIncomeGraph(data) {
                     anchor: 'end',
                     align: 'top',
                     formatter: (value) => value.toFixed(2) + '€',
-                    color: 'black'
+                    color: 'black',
+                    rotation: window.innerWidth <= 768 ? -40 : 0 // Rotate labels for mobile
+
                 }
             }
         },
@@ -447,6 +452,7 @@ function toggleSelection(array, data, row) {
         row.classList.add('selected');
     }
 }
+
 function mergePayments() {
     const mergeData = {
         operacionesGasto: selectedExpenses.map(formatOperacion),// Mapping all "gasto" operations
@@ -475,6 +481,7 @@ function mergePayments() {
         alert('Hubo un error al enviar la fusión de pagos.');
     });
 }
+
 function formatOperacion(operacion) {
     return {
         fechaOperacion: new Date(operacion.fechaOperacion).toISOString().replace('Z', '') + 'Z',
@@ -510,7 +517,6 @@ function updateTag(newTag, index, type) {
     });
 }
 
-
 function darkenColor(color, percent) {
     const num = parseInt(color.slice(1), 16),
         amt = Math.round(2.55 * percent),
@@ -520,116 +526,11 @@ function darkenColor(color, percent) {
     return `#${(0x1000000 + (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 + (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 + (B < 255 ? (B < 1 ? 0 : B) : 255)).toString(16).slice(1).toUpperCase()}`;
 }
 
-function generarEstadisticas(canvasId, data, label) {
-    const canvasContainer = document.getElementById(canvasId).parentNode;
-    canvasContainer.removeChild(document.getElementById(canvasId));
-
-    const newCanvas = document.createElement('canvas');
-    newCanvas.id = canvasId;
-    canvasContainer.appendChild(newCanvas);
-
-    const ctx = newCanvas.getContext('2d');
-    const etiquetas = [];
-    const montos = [];
-    let totalGasto = 0;
-
-    data.forEach(item => {
-        const index = etiquetas.indexOf(item.etiqueta);
-        const importeAbs = Math.abs(item.importe);
-        totalGasto += importeAbs;
-        if (index === -1) {
-            etiquetas.push(item.etiqueta);
-            montos.push(importeAbs);
-        } else {
-            montos[index] += importeAbs;
-        }
-    });
-
-    let totalGastoElement = document.getElementById('totalGasto');
-
-
-
-    if (!totalGastoElement) {
-        totalGastoElement = document.createElement('div');
-        totalGastoElement.id = 'totalGasto';
-        totalGastoElement.style.textAlign = 'center';
-        totalGastoElement.style.fontWeight = 'bold';
-        totalGastoElement.style.marginBottom = '20px';
-        totalGastoElement.style.fontSize = '1.7em';
-        canvasContainer.insertBefore(totalGastoElement, newCanvas);
-    }
-
-    const selectedMonth = document.getElementById('monthFilter').value;
-    console.log("EL MES SELECCIONADO ES: " + selectedMonth);
-    const selectedYear = document.getElementById('yearFilter').value;
-    let monthName = '';
-    if (selectedMonth !== '') {
-        monthName = new Date(2024, selectedMonth).toLocaleString('default', { month: 'long' });
-}
-    totalGastoElement.textContent = `Gasto Total en ${monthName} ${selectedYear}: ${totalGasto.toFixed(2)}€`;
-
-    const maxMonto = Math.max(...montos);
-    const stepSize = 100;
-    let maxY = Math.ceil(maxMonto / stepSize) * stepSize;
-
-    if (maxMonto >= maxY - 20) {
-        maxY += stepSize;
-    }
-
-    const backgroundColors = etiquetas.map(et => etiquetasColores[et] || '#ccc');
-    const borderColors = backgroundColors.map(color => darkenColor(color, 20));
-
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: etiquetas,
-            datasets: [{
-                label: "",
-                data: montos,
-                backgroundColor: backgroundColors,
-                borderColor: borderColors,
-                borderWidth: 3
-            }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: false
-                },
-                datalabels: {
-                    anchor: 'end',
-                    align: 'top',
-                    formatter: (value) => value.toFixed(2) + '€',
-                    color: 'black'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: maxY,
-                    ticks: {
-                        stepSize: stepSize
-                    }
-                }
-            },
-            onClick: (event, elements) => {
-                if (elements.length > 0) {
-                    const index = elements[0].index;
-                    const etiquetaSeleccionada = etiquetas[index];
-                    filtrarGastosPorEtiqueta(etiquetaSeleccionada, data);
-                }
-            }
-        },
-        plugins: [ChartDataLabels]
-    });
-}
-
-
-
 function filtrarGastosPorEtiqueta(etiqueta, data) {
     const gastosFiltrados = data.filter(gasto => gasto.etiqueta === etiqueta);
     cargarDatos('gastos-lista', gastosFiltrados, 'expense');
 }
+
 // script.js
 document.getElementById('uploadIcon').addEventListener('click', () => {
     document.getElementById('uploadForm').style.display = 'block';
@@ -653,11 +554,8 @@ document.getElementById('uploadForm').addEventListener('submit', (event) => {
 
         // Capture form values
         const xlsConfigurationDto = {
-            fechaNombre: document.getElementById('fechaNombre').value,
             fechaCelda: document.getElementById('fechaCelda').value,
-            conceptoNombre: document.getElementById('conceptoNombre').value,
             conceptoCelda: document.getElementById('conceptoCelda').value,
-            importeNombre: document.getElementById('importeNombre').value,
             importeCelda: document.getElementById('importeCelda').value,
             headerRow: document.getElementById('headerRow').value
         };
@@ -730,6 +628,112 @@ function fetchDataAndGenerateChartsAnuales(mesSeleccionado = null, anoSelecciona
     });
 }
 
+function generarEstadisticas(canvasId, data, label) {
+    const canvasContainer = document.getElementById(canvasId).parentNode;
+    canvasContainer.removeChild(document.getElementById(canvasId));
+
+    const newCanvas = document.createElement('canvas');
+    newCanvas.id = canvasId;
+    canvasContainer.appendChild(newCanvas);
+
+    const ctx = newCanvas.getContext('2d');
+    const etiquetas = [];
+    const montos = [];
+    let totalGasto = 0;
+
+    data.forEach(item => {
+        const index = etiquetas.indexOf(item.etiqueta);
+        const importeAbs = Math.abs(item.importe);
+        totalGasto += importeAbs;
+        if (index === -1) {
+            etiquetas.push(item.etiqueta);
+            montos.push(importeAbs);
+        } else {
+            montos[index] += importeAbs;
+        }
+    });
+
+    const sortedData = etiquetas.map((etiqueta, index) => ({ etiqueta, monto: montos[index] }))
+                                .sort((a, b) => b.monto - a.monto);
+    const sortedEtiquetas = sortedData.map(item => item.etiqueta);
+    const sortedMontos = sortedData.map(item => item.monto);
+
+    let totalGastoElement = document.getElementById('totalGasto');
+
+    if (!totalGastoElement) {
+        totalGastoElement = document.createElement('div');
+        totalGastoElement.id = 'totalGasto';
+        totalGastoElement.style.textAlign = 'center';
+        totalGastoElement.style.fontWeight = 'bold';
+        totalGastoElement.style.marginBottom = '20px';
+        totalGastoElement.style.fontSize = '1.7em';
+        canvasContainer.insertBefore(totalGastoElement, newCanvas);
+    }
+
+    const selectedMonth = document.getElementById('monthFilter').value;
+    const selectedYear = document.getElementById('yearFilter').value;
+    let monthName = '';
+    if (selectedMonth !== '') {
+        monthName = new Date(2024, selectedMonth).toLocaleString('default', { month: 'long' });
+    }
+    totalGastoElement.textContent = `Gasto Total en ${monthName} ${selectedYear}: ${totalGasto.toFixed(2)}€`;
+
+    const maxMonto = Math.max(...sortedMontos);
+    const stepSize = 100;
+    let maxY = Math.ceil(maxMonto / stepSize) * stepSize;
+
+    if (maxMonto >= maxY - 20) {
+        maxY += stepSize;
+    }
+
+    const backgroundColors = sortedEtiquetas.map(et => etiquetasColores[et] || '#ccc');
+    const borderColors = backgroundColors.map(color => darkenColor(color, 20));
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sortedEtiquetas,
+            datasets: [{
+                label: "",
+                data: sortedMontos,
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
+                borderWidth: 3
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: false
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value) => value.toFixed(2) + '€',
+                    color: 'black',
+                    rotation: window.innerWidth <= 768 ? -15 : 0 // Rotate labels for mobile
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: maxY,
+                    ticks: {
+                        stepSize: stepSize
+                    }
+                }
+            },
+            onClick: (event, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const etiquetaSeleccionada = sortedEtiquetas[index];
+                    filtrarGastosPorEtiqueta(etiquetaSeleccionada, data);
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+}
 
 function generarEstadisticasAnuales(canvasId, data, label) {
     const canvasContainer = document.getElementById(canvasId).parentNode;
@@ -756,9 +760,12 @@ function generarEstadisticasAnuales(canvasId, data, label) {
         }
     });
 
+    const sortedData = etiquetas.map((etiqueta, index) => ({ etiqueta, monto: montos[index] }))
+                                .sort((a, b) => b.monto - a.monto);
+    const sortedEtiquetas = sortedData.map(item => item.etiqueta);
+    const sortedMontos = sortedData.map(item => item.monto);
+
     let totalGastoElement = document.getElementById('totalGastoAnual');
-
-
 
     if (!totalGastoElement) {
         totalGastoElement = document.createElement('div');
@@ -774,7 +781,7 @@ function generarEstadisticasAnuales(canvasId, data, label) {
 
     totalGastoElement.textContent = `Gasto total en ${selectedYear}: ${totalGasto.toFixed(2)}€`;
 
-    const maxMonto = Math.max(...montos);
+    const maxMonto = Math.max(...sortedMontos);
     const stepSize = 100;
     let maxY = Math.ceil(maxMonto / stepSize) * stepSize;
 
@@ -782,16 +789,16 @@ function generarEstadisticasAnuales(canvasId, data, label) {
         maxY += stepSize;
     }
 
-    const backgroundColors = etiquetas.map(et => etiquetasColores[et] || '#ccc');
+    const backgroundColors = sortedEtiquetas.map(et => etiquetasColores[et] || '#ccc');
     const borderColors = backgroundColors.map(color => darkenColor(color, 20));
 
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: etiquetas,
+            labels: sortedEtiquetas,
             datasets: [{
                 label: "",
-                data: montos,
+                data: sortedMontos,
                 backgroundColor: backgroundColors,
                 borderColor: borderColors,
                 borderWidth: 3
@@ -806,7 +813,8 @@ function generarEstadisticasAnuales(canvasId, data, label) {
                     anchor: 'end',
                     align: 'top',
                     formatter: (value) => value.toFixed(2) + '€',
-                    color: 'black'
+                    color: 'black',
+                    rotation: window.innerWidth <= 768 ? -15 : 0 // Rotate labels for mobile
                 }
             },
             scales: {
@@ -821,7 +829,7 @@ function generarEstadisticasAnuales(canvasId, data, label) {
             onClick: (event, elements) => {
                 if (elements.length > 0) {
                     const index = elements[0].index;
-                    const etiquetaSeleccionada = etiquetas[index];
+                    const etiquetaSeleccionada = sortedEtiquetas[index];
                     filtrarGastosPorEtiqueta(etiquetaSeleccionada, data);
                 }
             }

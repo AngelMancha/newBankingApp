@@ -308,3 +308,83 @@ select {
     cursor: pointer;
     font-size: 1.5em; /* Adjust the size as needed */
 }
+
+#attachButton {
+    margin-left: 20px; /* Adjust the value as needed */
+    font-size: 1.5em; /* Adjust the size as needed */
+}
+
+#fileIcon:hover {
+    color: black;
+}
+
+#attachButton:hover {
+    color: black;
+}
+
+/* General styles for mobile devices */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    header {
+        padding: 0.5rem;
+        font-size: 1.2em;
+    }
+
+    #gastos, #ingresos {
+        width: 100%;
+    }
+
+    table {
+        width: 100%;
+        font-size: 0.9em;
+    }
+
+    th, td {
+        padding: 5px;
+    }
+
+    button, #monthFilter, #yearFilter {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        font-size: 0.9em;
+    }
+
+    .chart-container canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    .horizontal-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .horizontal-container section {
+        width: 100%;
+    }
+
+    #grafico-barras-section, #grafico-barras-section-anual {
+        width: 100%;
+        padding-top: 2rem;
+    }
+
+    .modal-content {
+        width: 90%;
+    }
+
+    #uploadForm {
+        padding: 10px;
+    }
+
+    #uploadForm input[type="text"],
+    #uploadForm input[type="number"] {
+        width: 100%;
+    }
+
+    #uploadForm button {
+        width: 100%;
+    }
+}

@@ -37,23 +37,20 @@
 </div>
 
 <form id="uploadForm" style="display: none;">
-    <label for="fechaNombre">Nombre columna Fecha:</label>
-    <input type="text" id="fechaNombre" name="fechaNombre" value="Fecha valor" required>
-    <label for="fechaCelda">Nº:</label>
+    <label for="fechaCelda">Nº Columna Fecha:</label>
     <input type="number" id="fechaCelda" name="fechaCelda" value="3" required>
-    <label for="conceptoNombre">Nombre columna Concepto:</label>
-    <input type="text" id="conceptoNombre" name="conceptoNombre" value="Concepto" required>
-    <label for="conceptoCelda">Nº:</label>
+    <label for="conceptoCelda">Nº Columna Concepto:</label>
     <input type="number" id="conceptoCelda" name="conceptoCelda" value="5" required>
-    <label for="importeNombre">Nombre columna Importe:</label>
-    <input type="text" id="importeNombre" name="importeNombre" value="Importe" required>
-    <label for="importeCelda">Nº:</label>
+    <label for="importeCelda">Nº Columna Importe:</label>
     <input type="number" id="importeCelda" name="importeCelda" value="7" required>
-    <label for="headerRow">Nº fila de cabeceras:</label>
+    <label for="headerRow">Nº Fila Cabeceras:</label>
     <input type="number" id="headerRow" name="headerRow" value="10" required>
-    <input type="file" id="fileInput" name="file" required style="display: none;" >
-    <i id="fileIcon" class="fas fa-file"></i>
-    <button type="submit">Upload</button>
+    <input type="file" id="fileInput" name="file" required style="display: none;">
+    <button type="button" id="fileIcon">
+        <i class="fas fa-upload"></i>
+        <i class="fas fa-file"></i>
+    </button>
+    <button type="submit" id="attachButton">Continuar</button>
 </form>
 
 <section id="gastos-y-grafico">
@@ -89,7 +86,7 @@
 
 <section id="ingresos-y-grafico" class="horizontal-container">
     <h2>Ingresos pendientes de procesar</h2>
-    <section id="ingresos" >
+    <section id="ingresos">
         <table>
             <thead>
             <tr>
@@ -104,17 +101,17 @@
             </tbody>
         </table>
         <div id="button_section">
-            <button id="mergeButton">Merge Payments</button>
+            <button id="mergeButton">Simplificar Pagos</button>
         </div>
     </section>
 
 </section>
 
-<h2 id = "monthlyExpensesTitle"></h2>
+<h2 id="monthlyExpensesTitle"></h2>
 <section id="monthly-expenses" class="flex-container">
 </section>
 
-<h2 id = "monthlyIncomesTitle"></h2>
+<h2 id="monthlyIncomesTitle"></h2>
 <section id="monthly-incomes" class="flex-container">
 </section>
 

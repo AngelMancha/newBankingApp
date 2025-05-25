@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  java-app:
+    build:
+      context: .
+      dockerfile: Dockerfile-java
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+  node-app:
+    build:
+      context: .
+      dockerfile: Dockerfile-node
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

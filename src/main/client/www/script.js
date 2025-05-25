@@ -70,6 +70,28 @@ mergeDetails.innerHTML = `
     document.getElementById('mergeModal').style.display = 'block';
 }
 
+document.getElementById("toggleStatsButton").addEventListener("click", function () {
+    const sections = [
+        document.getElementById("grafico-barras-section-anual"),
+        document.getElementById("monthlyExpensesTitle"),
+        document.getElementById("monthly-expenses"),
+        document.getElementById("monthlyIncomesTitle"),
+        document.getElementById("monthly-incomes")
+    ];
+
+    sections.forEach(section => {
+        section.classList.toggle("hidden");
+    });
+
+    // Cambiar el texto del botón
+    this.textContent = this.textContent === "Mostrar estadísticas anuales"
+        ? "Ocultar estadísticas anuales"
+        : "Mostrar estadísticas anuales";
+});
+
+
+
+
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -298,10 +320,10 @@ function cargarDatos(listaId, data, type) {
 }
 
 function createMonthlyExpensesGraph(data) {
-
     const selectedYear = document.getElementById('yearFilter').value;
     let totalGastoElement = document.getElementById('monthlyExpensesTitle');
     totalGastoElement.textContent = `Distribución mensual de gastos en ${selectedYear}:`;
+
     const monthlyExpensesContainer = document.getElementById('monthly-expenses');
     monthlyExpensesContainer.innerHTML = '<canvas id="monthlyExpensesChart" width="100" height="50"></canvas>';
 
@@ -317,6 +339,8 @@ function createMonthlyExpensesGraph(data) {
         monthlyExpensesChart.destroy();
     }
 
+    const isMobile = window.innerWidth <= 768; // Detect mobile screen size
+
     monthlyExpensesChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -326,12 +350,14 @@ function createMonthlyExpensesGraph(data) {
                 data: expenses,
                 backgroundColor: '#b68b40',
                 borderColor: '#122620',
-                borderWidth: 3
+                borderWidth: 1,
+                borderRadius: 10 // Rounded corners for bars
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            indexAxis: isMobile ? 'y' : 'x', // Horizontal bars for mobile
             scales: {
                 y: {
                     beginAtZero: true,
@@ -349,24 +375,28 @@ function createMonthlyExpensesGraph(data) {
                    display: false
                 },
                 datalabels: {
-                    anchor: 'end',
-                    align: 'top',
-                    formatter: (value) => value.toFixed(2) + '€',
-                    color: 'black',
-                    rotation: window.innerWidth <= 768 ? -40 : 0 // Rotate labels for mobile
-
+                    anchor: 'center', // Center the value inside the bar
+                    align: isMobile ? 'end' : 'center', // Center for vertical bars
+                    formatter: (value) => value === 0 ? '' : value.toFixed(2) + ' €',
+                    color: '#122620',
+                    font: {
+                        weight: 'bold', // Makes the text bold
+                        size: isMobile ? 12 : 13 // Adjust font size for mobile
+                    },
+                    rotation: isMobile ? 0 : -40 // No rotation for horizontal bars
                 }
             }
         },
         plugins: [ChartDataLabels]
     });
 }
-
 function createMonthlyIncomeGraph(data) {
     console.log('data:', data);
     const selectedYear = document.getElementById('yearFilter').value;
     let totalGastoElement = document.getElementById('monthlyIncomesTitle');
     totalGastoElement.textContent = `Distribución mensual de ingresos en ${selectedYear}:`;
+
+    const isMobile = window.innerWidth <= 768; // Detect mobile screen size
 
     const monthlyIncomesContainer = document.getElementById('monthly-incomes');
     monthlyIncomesContainer.innerHTML = '<canvas id="monthlyIncomesChart" width="100" height="50"></canvas>';
@@ -392,12 +422,16 @@ function createMonthlyIncomeGraph(data) {
                 data: expenses,
                 backgroundColor: '#122620',
                 borderColor: '#b68b40',
-                borderWidth: 3
+                borderWidth: 1,
+                borderRadius: 10 // Rounded corners for bars
+
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            indexAxis: isMobile ? 'y' : 'x', // Horizontal bars for mobile
+
             scales: {
                 y: {
                     beginAtZero: true,
@@ -415,11 +449,15 @@ function createMonthlyIncomeGraph(data) {
                    display: false
                 },
                 datalabels: {
-                    anchor: 'end',
-                    align: 'top',
-                    formatter: (value) => value.toFixed(2) + '€',
-                    color: 'black',
-                    rotation: window.innerWidth <= 768 ? -40 : 0 // Rotate labels for mobile
+                    anchor: 'center', // Center the value inside the bar
+                    align: isMobile ? 'end' : 'center', // Center for vertical bars
+                    formatter: (value) => value === 0 ? '' : value.toFixed(2) + ' €',
+                    color: '#b68b40',
+                    font: {
+                        weight: 'bold', // Makes the text bold
+                        size: isMobile ? 12 : 13 // Adjust font size for mobile
+                    },
+                    rotation: isMobile ? 0 : -40 // No rotation for horizontal bars
 
                 }
             }
@@ -636,6 +674,8 @@ function generarEstadisticas(canvasId, data, label) {
     newCanvas.id = canvasId;
     canvasContainer.appendChild(newCanvas);
 
+    const isMobile = window.innerWidth <= 768; // Detect mobile screen size
+
     const ctx = newCanvas.getContext('2d');
     const etiquetas = [];
     const montos = [];
@@ -698,20 +738,27 @@ function generarEstadisticas(canvasId, data, label) {
                 data: sortedMontos,
                 backgroundColor: backgroundColors,
                 borderColor: borderColors,
+                borderRadius: 10, // Rounded corners for labels
                 borderWidth: 3
             }]
         },
-        options: {
+        options:
+         {
+            indexAxis: isMobile ? 'y' : 'x', // Horizontal bars for mobile
             plugins: {
                 legend: {
                     display: false
                 },
                 datalabels: {
-                    anchor: 'end',
-                    align: 'top',
-                    formatter: (value) => value.toFixed(2) + '€',
+                    anchor: 'center', // Center the value inside the bar
+                    align: isMobile ? 'end' : 'center', // Center for vertical bars
+                    formatter: (value) => value.toFixed(2) + ' €',
                     color: 'black',
-                    rotation: window.innerWidth <= 768 ? -15 : 0 // Rotate labels for mobile
+                    font: {
+                        weight: 'bold', // Makes the text bold
+                        size: isMobile ? 12 : 16 // Adjust font size for mobile
+                    },
+                    rotation: isMobile ? 0 : 0 // No rotation for horizontal bars
                 }
             },
             scales: {
@@ -742,6 +789,8 @@ function generarEstadisticasAnuales(canvasId, data, label) {
     const newCanvas = document.createElement('canvas');
     newCanvas.id = canvasId;
     canvasContainer.appendChild(newCanvas);
+
+    const isMobile = window.innerWidth <= 768; // Detect mobile screen size
 
     const ctx = newCanvas.getContext('2d');
     const etiquetas = [];
@@ -801,20 +850,29 @@ function generarEstadisticasAnuales(canvasId, data, label) {
                 data: sortedMontos,
                 backgroundColor: backgroundColors,
                 borderColor: borderColors,
+                                borderRadius: 10, // Rounded corners for labels
+
                 borderWidth: 3
             }]
         },
         options: {
+            indexAxis: isMobile ? 'y' : 'x', // Horizontal bars for mobile
+            responsive: true,
+
             plugins: {
                 legend: {
                     display: false
                 },
                 datalabels: {
-                    anchor: 'end',
-                    align: 'top',
-                    formatter: (value) => value.toFixed(2) + '€',
+                    anchor: 'center', // Center the value inside the bar
+                    align: isMobile ? 'end' : 'center', // Center for vertical bars
+                    formatter: (value) => value.toFixed(2) + ' €',
                     color: 'black',
-                    rotation: window.innerWidth <= 768 ? -15 : 0 // Rotate labels for mobile
+                    font: {
+                        weight: 'bold', // Makes the text bold
+                        size: isMobile ? 12 : 16 // Adjust font size for mobile
+                    },
+                    rotation: isMobile ? 0 : 0 // No rotation for horizontal bars
                 }
             },
             scales: {

@@ -85,39 +85,44 @@
 </div>
 
 <section id="ingresos-y-grafico" class="horizontal-container">
-    <h2>Ingresos pendientes de procesar</h2>
-    <section id="ingresos">
-        <table>
-            <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Concepto</th>
-                <th>Importe</th>
-                <th>Etiqueta</th>
-            </tr>
-            </thead>
-            <tbody id="ingresos-lista">
-            <!-- Las filas se agregarán dinámicamente aquí -->
-            </tbody>
-        </table>
-        <div id="button_section">
-            <button id="mergeButton">Simplificar Pagos</button>
-        </div>
-    </section>
-
+    <details>
+        <summary>
+            <h2>Ingresos pendientes de procesar</h2>
+        </summary>
+        <section id="ingresos">
+            <table>
+                <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Concepto</th>
+                    <th>Importe</th>
+                    <th>Etiqueta</th>
+                </tr>
+                </thead>
+                <tbody id="ingresos-lista">
+                <!-- Las filas se agregarán dinámicamente aquí -->
+                </tbody>
+            </table>
+            <div id="button_section">
+                <button id="mergeButton">Simplificar Pagos</button>
+            </div>
+        </section>
+    </details>
 </section>
 
-<h2 id="monthlyExpensesTitle"></h2>
-<section id="monthly-expenses" class="flex-container">
-</section>
-
-<h2 id="monthlyIncomesTitle"></h2>
-<section id="monthly-incomes" class="flex-container">
-</section>
-
-<section id="grafico-barras-section-anual">
+<button id="toggleStatsButton" class="elegant-button">Mostrar estadísticas anuales</button>
+<section id="grafico-barras-section-anual" class="hidden">
     <canvas id="grafico-gastos-anual"></canvas>
 </section>
+
+<h2 id="monthlyExpensesTitle" class="hidden"></h2>
+<section id="monthly-expenses" class="flex-container hidden">
+</section>
+
+<h2 id="monthlyIncomesTitle" class="hidden"></h2>
+<section id="monthly-incomes" class="flex-container hidden">
+</section>
+
 
 
 <script src="script.js"></script>

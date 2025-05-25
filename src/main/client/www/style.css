@@ -1,11 +1,21 @@
 body {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px; /* Ajusta el tamaño de la fuente según sea necesario */
+        line-height: 1.6; /* Mejora la legibilidad */
+        color: #333; /* Color de texto predeterminado */
     margin: 0;
     padding: 20px;
     background-color: #f4ebd0;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* Asegúrate de que todos los elementos hereden el estilo */
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
 }
 
 header {
@@ -16,12 +26,10 @@ header {
     border-radius: 0 0 15px 15px;
     width: 100%;
     box-sizing: border-box;
-    font-family: 'Cormorant Garamond', serif;
-
 }
 
 
-#gastos, #ingresos {
+#gastos {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -29,6 +37,17 @@ header {
     width: 80%;
     margin-bottom: 20px;
 }
+
+
+#ingresos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
 
 
 
@@ -48,41 +67,55 @@ header {
     width: 100%;
 }
 table {
-    width: 80%;
-    margin-bottom: 1rem;
-    font-family: 'Cormorant Garamond', serif;
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
     border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 15px;
+    text-align: center;
+    font-size: 1em;
 }
 
 th {
-    border: 1px solid #ddd;
-    border-radius: 0 0 15px 15px;
-    padding: 8px;
+    background: linear-gradient(45deg, #122620, #DBAD60); /* App color gradient */
+    color: #f4ebd0; /* Light beige text for contrast */
     font-weight: bold;
-    text-align: center;
-        font-family: 'Cormorant Garamond', serif;
-
-
+    text-transform: uppercase; /* Uppercase for emphasis */
+    letter-spacing: 0.1em; /* Slight letter spacing */
+    padding: 15px;
+    border-bottom: 4px solid #122620; /* Bold border with dark green */
+    font-size: 1.2em; /* Slightly larger font size */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    border-radius: 10px 10px 0 0; /* Rounded top corners */
 }
+
 td {
-    border: 1px solid #ddd;
-    border-radius:15px;
-    padding: 8px;
-    font-weight: bold;
-    text-align: center;
-        font-family: 'Cormorant Garamond', serif;
-
-
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-td:nth-child(2) {
-    text-align: left;
+tr:nth-child(even) td {
+    background-color: #f1f1f1;
 }
 
-th {
-    background: linear-gradient(to right, #b68b40, #DBAD60);
+tr:hover td {
+    background-color: #e0f7fa;
+    transform: scale(1.02);
+    transition: all 0.3s ease;
 }
 
+td:first-child, th:first-child {
+    border-radius: 15px 0 0 15px;
+}
+
+td:last-child, th:last-child {
+    border-radius: 0 15px 15px 0;
+}
 button, #monthFilter, #yearFilter {
     margin: 1rem;
     padding: 0.5rem 1rem;
@@ -91,7 +124,6 @@ button, #monthFilter, #yearFilter {
     border: none;
     border-radius: 20px;
     cursor: pointer;
-    font-family: 'Cormorant Garamond', serif;
 
 }
 
@@ -144,7 +176,7 @@ select {
 
 .horizontal-container {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: flex-start;
     margin-bottom: 20px;
 }
@@ -159,7 +191,12 @@ select {
 
 #grafico-barras-section, #grafico-barras-section-anual {
     padding-top: 4rem;
-    width: 50%;
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+    background: #ffffff; /* Fondo blanco */
+    border-radius: 20px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
 }
 
 .modal {
@@ -248,14 +285,19 @@ select {
 #monthlyExpensesChart, #monthlyIncomesChart {
     width: 100% !important;
     height: auto !important;
+
+
 }
 
 #monthly-expenses, #monthly-incomes {
     width: 100%;
     max-width: 1000px;
-    margin: 0 auto;
-}
 
+    background: #f9f9f9; /* Fondo claro */
+    border-radius: 20px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+
+}
 
 /* Estilo para el formulario de subida */
 #uploadForm {
@@ -321,35 +363,151 @@ select {
 #attachButton:hover {
     color: black;
 }
+details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    width: 100%;
+}
 
+details summary {
+    list-style: none; /* Elimina el triángulo predeterminado */
+    cursor: pointer;
+    background: linear-gradient(to right, #b68b40, #DBAD60); /* Gradiente suave */
+    color: black; /* Texto oscuro */
+    border: none;
+    border-radius: 20px; /* Bordes redondeados */
+    padding: 0.5rem 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    font-size: 1em;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+details summary:hover {
+    background-color: #005bb5; /* Color de hover */
+    color: white; /* Texto blanco al pasar el cursor */
+    transform: scale(1.05); /* Efecto de zoom */
+}
+
+details[open] summary {
+    background: linear-gradient(to right, #d1d1d1, #f0f0f0); /* Cambia el color al abrir */
+}
+
+details section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+details table {
+
+
+    width: 90%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+details #button_section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+details #mergeButton {
+    padding: 0.5rem 1.5rem;
+    background: linear-gradient(to right, #b68b40, #DBAD60); /* Gradiente suave */
+    color: black;
+    border: none;
+    border-radius: 20px; /* Bordes redondeados */
+    cursor: pointer;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+details #mergeButton:hover {
+    background-color: #005bb5; /* Color de hover */
+    color: white; /* Texto blanco al pasar el cursor */
+    transform: scale(1.05); /* Efecto de zoom */
+}
+
+.hidden {
+    display: none;
+}
+
+button.elegant-button {
+    list-style: none !important;
+    cursor: pointer !important;
+    background: linear-gradient(to right, #b68b40, #DBAD60) !important; /* Gradiente suave */
+    color: black !important;
+    border: none !important;
+    border-radius: 20px !important; /* Bordes redondeados */
+    padding: 1.7rem 0.7rem !important; /* Aumenta el relleno */
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif !important; /* Fuente de Apple */
+    font-weight: bold;
+    font-size: 1.5em !important; /* Aumenta el tamaño de fuente */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important; /* Sombra sutil */
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    width: 100% !important; /* Aumenta el ancho */
+    max-width: 400px; /* Limita el ancho máximo */
+    margin: 1rem auto !important; /* Centra el botón */
+}
+
+button.elegant-button:hover {
+    background-color: #005bb5 !important; /* Color de hover */
+    color: white !important;
+    transform: scale(1.05) !important; /* Efecto de zoom */
+}
 /* General styles for mobile devices */
 @media (max-width: 768px) {
     body {
         padding: 10px;
+        font-size: 14px; /* Reduce el tamaño de fuente para pantallas pequeñas */
     }
 
     header {
         padding: 0.5rem;
         font-size: 1.2em;
+        text-align: center; /* Asegura que el texto esté centrado */
     }
 
     #gastos, #ingresos {
         width: 100%;
+        margin-bottom: 1rem; /* Añade espacio entre secciones */
     }
 
     table {
         width: 100%;
-        font-size: 0.9em;
+        font-size: 0.85em; /* Reduce ligeramente el tamaño de fuente */
     }
 
     th, td {
-        padding: 5px;
+        padding: 8px; /* Ajusta el relleno para ahorrar espacio */
+        word-wrap: break-word; /* Permite que el texto se ajuste en celdas pequeñas */
     }
 
     button, #monthFilter, #yearFilter {
         margin: 0.5rem;
-        padding: 0.5rem;
-        font-size: 0.9em;
+        padding: 0.7rem;
+        font-size: 1em; /* Asegura que los botones sean legibles */
+        width: 100%; /* Botones ocupan todo el ancho disponible */
     }
 
     .chart-container canvas {
@@ -360,31 +518,111 @@ select {
     .horizontal-container {
         flex-direction: column;
         align-items: center;
+        gap: 1rem; /* Añade espacio entre secciones */
     }
 
     .horizontal-container section {
         width: 100%;
     }
 
-    #grafico-barras-section, #grafico-barras-section-anual {
-        width: 100%;
-        padding-top: 2rem;
-    }
 
     .modal-content {
-        width: 90%;
+        width: 90%; /* Ajusta el ancho del modal para pantallas pequeñas */
+        padding: 1rem; /* Reduce el relleno para pantallas pequeñas */
+        font-size: 0.9em; /* Reduce el tamaño de fuente */
     }
 
-    #uploadForm {
-        padding: 10px;
+    .modal {
+        padding: 10px; /* Añade un poco de espacio alrededor del modal */
+    }
+#uploadForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    width: 100%; /* Asegura que el formulario ocupe todo el ancho disponible */
+    max-width: 400px; /* Limita el ancho máximo del formulario */
+    box-sizing: border-box;
+}
+
+#fileIcon, #attachButton {
+    width: 100%; /* Ajusta el ancho al del formulario */
+    font-size: 1.2em; /* Ajusta el tamaño de fuente */
+    padding: 15px; /* Añade relleno para mejor interacción táctil */
+    display: flex;
+    justify-content: center;
+    padding: 15px; /* Ajusta el relleno para mejor interacción táctil */
+    align-items: center;
+    border: 1px solid #ccc; /* Añade un borde para definición */
+    border-radius: 10px; /* Bordes redondeados */
+    background-color: #f9f9f9; /* Fondo claro */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    nmargin: 10px auto; /* Añade separación vertical y centra los botones */
+
+}
+
+#fileIcon:hover, #attachButton:hover {
+    background-color: #e0f7fa; /* Cambia el fondo al pasar el cursor */
+    transform: scale(1.05); /* Efecto de zoom */
+    transition: all 0.3s ease; /* Transición suave */
+}
+
+    #filterContainer {
+        display: flex;
+        align-items: center; /* Center elements horizontally */
     }
 
-    #uploadForm input[type="text"],
-    #uploadForm input[type="number"] {
-        width: 100%;
+    #uploadIcon {
+        position: static; /* Remove absolute positioning */
+        margin: 10px 0 0 0; /* Add spacing above */
+        font-size: 1.5em; /* Adjust size for better visibility */
+        color: #DBAD60; /* Maintain consistent color scheme */
     }
 
-    #uploadForm button {
-        width: 100%;
+    #uploadIcon:hover {
+        color: #005bb5; /* Change color on hover */
+    }
+
+#uploadForm input[type="text"],
+#uploadForm input[type="number"] {
+    width: 100%; /* Ensure inputs take full width */
+    padding: 10px; /* Add padding for better usability */
+    border: 1px solid #ccc; /* Consistent border style */
+    border-radius: 5px; /* Rounded corners for inputs */
+    font-size: 1em; /* Maintain readable font size */
+    box-sizing: border-box; /* Prevent overflow issues */
+}
+
+#uploadForm button {
+    width: 100%; /* Buttons take full width */
+    padding: 12px; /* Increased padding for better clickability */
+    font-size: 1.1em; /* Slightly larger font for emphasis */
+    font-weight: bold; /* Make text stand out */
+    background: linear-gradient(to right, #b68b40, #DBAD60); /* Gradient for a modern look */
+    color: black; /* Ensure text is readable */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners for buttons */
+    cursor: pointer; /* Indicate interactivity */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+}
+
+#uploadForm button:hover {
+    background-color: #005bb5; /* Change background on hover */
+    color: white; /* Ensure text contrast */
+    transform: scale(1.05); /* Slight zoom effect */
+}
+    details summary {
+        font-size: 1em; /* Ajusta el tamaño del texto del resumen */
+        padding: 0.7rem 1rem; /* Aumenta el relleno para mejor interacción táctil */
+    }
+
+    details section {
+        padding: 0.5rem; /* Reduce el espacio interno */
     }
 }
+
+

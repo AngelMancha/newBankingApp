@@ -1,23 +1,20 @@
 version: '3.8'
+
 services:
   java-app:
+    image: java-app
     build:
       context: .
       dockerfile: Dockerfile-java
     ports:
       - "8080:8080"
-    networks:
-      - app-network
+    depends_on:
+      - node-app
 
   node-app:
+    image: node-app
     build:
-      context: .
+      context: ./src/main/client
       dockerfile: Dockerfile-node
     ports:
       - "3000:3000"
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge

@@ -97,6 +97,9 @@ th {
 td {
     background-color: #f9f9f9;
     color: #333;
+    padding: 8px; /* Reduce el padding para disminuir la altura */
+    text-align: center;
+    font-size: 1em;
 }
 
 tr:nth-child(even) td {
@@ -482,16 +485,26 @@ button.elegant-button:hover {
         font-size: 14px; /* Reduce el tamaño de fuente para pantallas pequeñas */
     }
 
+@media (max-width: 768px) {
     header {
-        padding: 0.5rem;
         font-size: 1.2em;
-        text-align: center; /* Asegura que el texto esté centrado */
+        text-align: center;
+        width: 90%; /* Asegura el mismo ancho que la tabla */
     }
 
-    #gastos, #ingresos {
-        width: 100%;
-        margin-bottom: 1rem; /* Añade espacio entre secciones */
+    #gastos {
+        width: 50%; /* Asegura el mismo ancho */
+        margin: 0 auto; /* Centra los contenedores */
+        margin-left: 0px; /* Elimina el margen izquierdo */
+        margin-right:210px; /* Elimina el margen derecho */
     }
+
+    #ingresos {
+            width: 50%; /* Asegura el mismo ancho */
+            margin: 0 auto; /* Centra los contenedores */
+            margin-left: 0px; /* Elimina el margen izquierdo */
+            margin-right:0px; /* Elimina el margen derecho */
+        }
 
     table {
         width: 100%;

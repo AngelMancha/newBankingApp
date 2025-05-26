@@ -1,9 +1,11 @@
 const express = require('express');
 const path = require('path');
-const punycode = require('punycode'); // Desde el módulo npm
-
+const punycode = require('punycode'); // Aunque no parece que se use
 
 const app = express();
+
+// Parsear JSON automáticamente
+app.use(express.json());
 
 // Sirve archivos estáticos desde la carpeta 'www'
 app.use(express.static(path.join(__dirname, 'www')));

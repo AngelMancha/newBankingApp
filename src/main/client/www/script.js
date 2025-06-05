@@ -168,7 +168,7 @@ function filtrarPorMes() {
 
 function fetchMonthylyIncome() {
 
-    const montlyTilesUrl = 'http://localhost:8080/banking/get_payroll_month ';
+    const montlyTilesUrl = 'http://java-app:8080/banking/get_payroll_month';
     const requestBody = {
         year: getCookie('selectedYear')
     };
@@ -189,7 +189,7 @@ function fetchMonthylyIncome() {
 
 function fetchMonthlyExpenses() {
 
-    const montlyTilesUrl = 'http://localhost:8080/banking/get_expenses_month';
+    const montlyTilesUrl = 'http://java-app:8080/banking/get_expenses_month';
     const requestBody = {
         year: getCookie('selectedYear')
     };
@@ -208,8 +208,8 @@ function fetchMonthlyExpenses() {
 }
 
 function fetchDataAndGenerateCharts(mesSeleccionado = null, anoSeleccionado = null) {
-    const expensesUrl = 'http://localhost:8080/banking/get_expenses';
-    const incomeUrl = 'http://localhost:8080/banking/get_income';
+    const expensesUrl = 'http://java-app:8080/banking/get_expenses';
+    const incomeUrl = 'http://java-app:8080/banking/get_income';
 
     const requestBody = {
         month: getCookie('selectedMonth'),
@@ -249,8 +249,8 @@ function fetchDataAndGenerateCharts(mesSeleccionado = null, anoSeleccionado = nu
 }
 
 function fetchDataAndGenerateChartsForYear(mesSeleccionado = null, anoSeleccionado = null) {
-    const expensesUrl = 'http://localhost:8080/banking/get_expenses_anuales';
-    const incomeUrl = 'http://localhost:8080/banking/get_income';
+    const expensesUrl = 'http://java-app:8080/banking/get_expenses_anuales';
+    const incomeUrl = 'http://java-app:8080/banking/get_income';
 
     const requestBody = {
         year: getCookie('selectedYear')
@@ -497,7 +497,7 @@ function mergePayments() {
         operacionesIngreso: selectedIncomes.map(formatOperacion)
     };
 
-    fetch('http://localhost:8080/banking/adjust_payment', {
+    fetch('http://java-app:8080/banking/adjust_payment', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -533,7 +533,7 @@ function updateTag(newTag, index, type) {
     const changeTagData = formatOperacion(selectedRowForTag);
     changeTagData.etiqueta = newTag.value;
 
-    fetch('http://localhost:8080/banking/change_tag', {
+    fetch('http://java-app:8080/banking/change_tag', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -601,7 +601,7 @@ document.getElementById('uploadForm').addEventListener('submit', (event) => {
         formData.append('xlsConfigurationDto', new Blob([JSON.stringify(xlsConfigurationDto)], { type: 'application/json' }));
 
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://localhost:8080/banking/upload', true);
+        xhr.open('POST', 'http://java-app:8080/banking/upload', true);
 
         xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {
@@ -635,7 +635,7 @@ document.getElementById('closeUploadModal').addEventListener('click', () => {
 
 
 function fetchDataAndGenerateChartsAnuales(mesSeleccionado = null, anoSeleccionado = null) {
-    const expensesUrl = 'http://localhost:8080/banking/get_expenses_anuales';
+    const expensesUrl = 'http://java-app:8080/banking/get_expenses_anuales';
 
     const requestBody = {
         month: getCookie('selectedMonth'),

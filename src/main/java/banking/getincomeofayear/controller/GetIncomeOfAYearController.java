@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/banking")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class GetIncomeOfAYearController {
 
     private final GetIncomeOfAYearUseCaseInterface getIncomeUseCase;

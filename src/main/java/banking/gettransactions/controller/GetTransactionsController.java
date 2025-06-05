@@ -15,7 +15,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/banking")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 
 public class GetTransactionsController {
     private final GetTransactionsUseCaseInterface getTransactionsUseCase;

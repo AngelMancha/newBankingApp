@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   java-app:
     image: java-app
@@ -10,6 +9,9 @@ services:
       - "8080:8080"
     depends_on:
       - node-app
+      - postgres-db
+    networks:
+      - app-network
 
   node-app:
     image: node-app
@@ -18,3 +20,26 @@ services:
       dockerfile: Dockerfile-node
     ports:
       - "3000:3000"
+    networks:
+      - app-network
+
+  postgres-db:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: angelmancha
+      POSTGRES_PASSWORD: kHpXVIf5XjBl4hmfJ0OcnJfwiQRH3RfM
+      POSTGRES_DB: bankingdatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

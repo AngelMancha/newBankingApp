@@ -15,8 +15,8 @@ window.onload = () => {
     });
 };
 const etiquetasIconos = {
+    "Sin etiqueta": "fa-tag",
     "Restauracion": "fa-utensils",
-    "Empresa": "fa-building",
     "Ingresos": "fa-money-bill-wave",
     "Ocio": "fa-solid fa-ticket",
     "Viajes": "fa-plane",
@@ -28,8 +28,8 @@ const etiquetasIconos = {
      "Otros": "fa-shopping-cart",
 };
 const etiquetasColores = {
+    "Sin etiqueta": "#D9D9D9",  // Muted Gray
     "Ocio": "#B5655C",         // Muted Red
-    "Empresa": "#8A9BA8",      // Muted Blue
     "Restauracion": "#D9A05B", // Muted Orange
     "Viajes": "#D9A5B3",       // Muted Pink
     "Ingresos": "#6FA8DC",     // Muted Light Blue

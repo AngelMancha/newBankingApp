@@ -82,16 +82,16 @@ th, td {
 }
 
 th {
-    background: linear-gradient(45deg, #122620, #DBAD60); /* App color gradient */
-    color: #f4ebd0; /* Light beige text for contrast */
+    background: linear-gradient(to right, #b68b40, #DBAD60); /* Gradiente suave */
+    color: black; /* Texto oscuro para contraste */
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; /* Fuente */
     font-weight: bold;
-    text-transform: uppercase; /* Uppercase for emphasis */
-    letter-spacing: 0.1em; /* Slight letter spacing */
-    padding: 15px;
-    border-bottom: 4px solid #122620; /* Bold border with dark green */
-    font-size: 1.2em; /* Slightly larger font size */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
-    border-radius: 10px 10px 0 0; /* Rounded top corners */
+    font-size: 1.2em; /* Tamaño de fuente ligeramente mayor */
+    padding: 15px; /* Espaciado interno */
+    text-align: center;
+    border-radius: 10px 10px 0 0; /* Bordes redondeados en la parte superior */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    border: none; /* Sin bordes */
 }
 
 td {
@@ -104,6 +104,16 @@ td {
 
 tr:nth-child(even) td {
     background-color: #f1f1f1;
+}
+
+table tr.selected td {
+    background-color: rgba(76, 175, 80, 0.5) !important; /* Green with 50% transparency */
+    font-weight: bold; /* Make the text bold */
+    color: black; /* Optional: Change text color for better contrast */
+}
+table tr.selected:hover td {
+    transform: none !important; /* Elimina el efecto de escala */
+    transition: none !important; /* Elimina la transición */
 }
 
 tr:hover td {
@@ -399,9 +409,7 @@ details summary:hover {
     transform: scale(1.05); /* Efecto de zoom */
 }
 
-details[open] summary {
-    background: linear-gradient(to right, #d1d1d1, #f0f0f0); /* Cambia el color al abrir */
-}
+
 
 details section {
     display: flex;
